@@ -8,7 +8,7 @@ DATA_FILES_PATH = "../data"
 
 def fetch_fred_data():
     # returns a pandas DF with "CPIAUCSL", "UNRATE", "FEDFUNDS","GDP","PAYEMS" datasets
-    API_KEY = "e12d52ceb543405fc7b8a928461fbf5a"
+    API_KEY = ""
     BASE_URL = "https://api.stlouisfed.org/fred/series/observations"
     METADATA_URL = "https://api.stlouisfed.org/fred/series"
 
