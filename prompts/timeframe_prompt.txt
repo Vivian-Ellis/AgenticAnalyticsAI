@@ -1,0 +1,37 @@
+Your task is to determine the start and end timeframe for the given statement.
+
+Assumptions:
+- Assume today's date is {todays_date}.
+
+Date Interpretation Rules:
+- For year-only references:
+  - Use January 1st as the start date.
+  - Use December 31st as the end date where applicable.
+
+- For relative year-based durations such as:
+  - last 5 years
+  - last 10 years
+  - last 30 years
+
+  infer the start year relative to today's date and use January 1st of that inferred year as the start date.
+
+- If no end date is explicitly stated, use today's date as the end date.
+- If the question requests comparison across N periods without explicitly defining dates:
+  - infer the N most recent COMPLETE periods where periods are {aggregation_period}.
+- If no timeframe can be inferred, default to the most recent 10 calendar years ending on today's date.
+
+Examples:
+- "since 2020" -> 2020-01-01,{todays_date}
+- "between 2010 and 2020" -> 2010-01-01,2020-12-31
+- "in 2024" -> 2024-01-01,2024-12-31
+- "last 10 years" -> 2016-01-01,{todays_date}
+- "compare across three quarters" -> previous three complete quarters
+
+Output Rules:
+- Return ONLY two values in the format:
+  YYYY-MM-DD,YYYY-MM-DD
+
+- Do not include labels, explanations, bullets, or additional text.
+
+Statement:
+{question}

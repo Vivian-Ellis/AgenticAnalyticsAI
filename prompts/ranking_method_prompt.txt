@@ -1,0 +1,49 @@
+Task:
+Your task is to determine the pandas ranking parameters for the given statement.
+
+Pandas Ranking Meaning:
+- Return the value that should be passed into pandas df.sort_values(ascending=...).
+- ascending=True means lowest/smallest values first.
+- ascending=False means highest/largest values first.
+- -1 for N means return all ranked rows.
+
+Direction Rules:
+- highest, largest, greatest, strongest, top, maximum -> ascending=False
+- lowest, smallest, least, weakest, bottom, minimum -> ascending=True
+- highest volatility -> ascending=False
+- lowest volatility -> ascending=True
+
+Best/Worst Rules:
+- Use the provided metric context to decide whether high or low values are better/worse.
+- If higher values are better:
+  - best -> ascending=False
+  - worst -> ascending=True
+- If lower values are better:
+  - best -> ascending=True
+  - worst -> ascending=False
+- If metric context is unavailable and direction is ambiguous, default to ascending=False.
+
+Dataset Semantics:
+{series_semantics}
+
+Ranking Count Rules:
+- If the statement gives a number, return that number.
+- If no number is given, return -1.
+
+Output Rules:
+- Return ONLY two values in the format:
+  ascending_boolean,N
+- ascending_boolean must be either True or False.
+- N must be a whole number or -1.
+- Do not include labels, explanations, bullets, or additional text.
+
+Examples:
+- "Rank the worst unemployment years since 2010" -> False,-1
+- "Show the top years for GDP levels" -> False,-1
+- "Show the bottom 5 federal funds rate years" -> True,5
+- "List the 3 lowest inflation years" -> True,3
+- "Rank unemployment years" -> False,-1
+- "Which years had the greatest monthly unemployment changes?" -> False,-1
+
+Statement:
+{question}

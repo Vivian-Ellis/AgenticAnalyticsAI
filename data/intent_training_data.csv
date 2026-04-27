@@ -1,0 +1,301 @@
+question,label
+How has unemployment changed since 2020?,trend
+Show inflation trends after 2015.,trend
+How did GDP evolve over time?,trend
+What happened to payrolls after COVID?,trend
+Analyze unemployment trends since 2010.,trend
+How has CPI changed over the last decade?,trend
+Show the long-term trend in interest rates.,trend
+Describe changes in inflation after 2021.,trend
+How has the unemployment rate moved since 2018?,trend
+Plot the yearly trend in GDP.,trend
+How has the federal funds rate changed since 2019?,trend
+Show the trend in nonfarm payrolls since 2020.,trend
+Describe the direction of CPI since 2010.,trend
+How has GDP changed from 2015 to 2025?,trend
+What is the unemployment trend over the past decade?,trend
+Show annual changes in inflation since 2000.,trend
+How did interest rates move after 2022?,trend
+Analyze the trend in payroll employment since 2016.,trend
+How has CPI evolved since the pandemic?,trend
+Show the monthly trend in unemployment.,trend
+Describe the quarterly trend in GDP.,trend
+How has the labor market changed since 2015?,trend
+Show how prices changed over time.,trend
+What is the trend in federal funds rate since 2008?,trend
+Analyze unemployment movement between 2010 and 2020.,trend
+How has total nonfarm employment changed since 2010?,trend
+Show the trajectory of inflation after 2020.,trend
+How did GDP levels change before and after 2020?,trend
+What happened to interest rates from 2020 onward?,trend
+Describe unemployment levels over time.,trend
+Show yearly average unemployment since 2015.,trend
+How have payrolls moved since 2021?,trend
+What is the long-run CPI trend?,trend
+Analyze GDP movement since 1990.,trend
+How has the average federal funds rate changed over time?,trend
+Show unemployment changes after 2008.,trend
+Describe the trend in inflation since 1995.,trend
+How did payroll employment evolve after 2012?,trend
+What is the yearly trend in CPI?,trend
+Show the time series trend for UNRATE.,trend
+How has FEDFUNDS moved since 2020?,trend
+Describe the pattern in GDP since 2000.,trend
+How has the unemployment rate shifted over the years?,trend
+What trend appears in payroll employment after 2020?,trend
+Show the annual path of inflation.,trend
+How did CPI change from 2019 through 2024?,trend
+Analyze the post-2020 trend in unemployment.,trend
+Show the direction of GDP since 2015.,trend
+How has the average unemployment rate changed since 2020?,trend
+What is the recent trend in interest rates?,trend
+Compare unemployment and inflation since 2020.,comparison
+Compare GDP and payroll growth.,comparison
+How does unemployment compare to interest rates?,comparison
+Compare CPI before and after COVID.,comparison
+Compare payrolls in 2024 versus 2025.,comparison
+Compare inflation and federal funds rate trends.,comparison
+Compare unemployment across decades.,comparison
+Compare GDP growth before and after 2008.,comparison
+Compare monthly and yearly unemployment averages.,comparison
+Compare payroll growth and inflation.,comparison
+Compare CPI and FEDFUNDS since 2015.,comparison
+Compare unemployment in 2020 versus 2021.,comparison
+How do payrolls compare before and after 2020?,comparison
+Compare GDP and CPI over time.,comparison
+Compare unemployment and nonfarm payrolls since 2010.,comparison
+Compare average inflation in 2021 and 2022.,comparison
+Compare federal funds rate levels before and after 2022.,comparison
+How does GDP compare to payroll employment?,comparison
+Compare unemployment trends in 2019 and 2020.,comparison
+Compare yearly unemployment averages across two periods.,comparison
+Compare inflation before 2020 with inflation after 2020.,comparison
+How do CPI and interest rates differ since 2020?,comparison
+Compare PAYEMS and UNRATE since 2018.,comparison
+Compare the labor market indicators since 2015.,comparison
+Compare quarterly GDP with monthly payroll trends.,comparison
+Compare the average unemployment rate in 2024 to 2025.,comparison
+How did CPI compare with federal funds rate after 2021?,comparison
+Compare economic growth and inflation since 2010.,comparison
+Compare the highest and lowest unemployment periods.,comparison
+Compare unemployment during 2020 and 2023.,comparison
+How does inflation compare across decades?,comparison
+Compare the trend in GDP and CPI.,comparison
+Compare payroll levels before and after COVID.,comparison
+Compare interest rates in 2022 versus 2024.,comparison
+Compare unemployment and GDP since 2008.,comparison
+Compare CPI and payroll employment since 2015.,comparison
+How do unemployment rates compare between 2010 and 2020?,comparison
+Compare the average federal funds rate before and after 2020.,comparison
+Compare annual CPI averages across recent years.,comparison
+How does unemployment compare with payroll employment after 2020?,comparison
+Compare yearly GDP averages in two time windows.,comparison
+Compare inflation trends in 2021 and 2023.,comparison
+Compare the federal funds rate to unemployment since 2020.,comparison
+Compare PAYEMS and GDP growth since 2010.,comparison
+Compare labor market metrics after COVID.,comparison
+How does CPI compare to unemployment over time?,comparison
+Compare monthly unemployment rates in 2024 versus 2025.,comparison
+Compare interest rate movements to inflation movements.,comparison
+Compare GDP levels before and after the pandemic.,comparison
+Compare unemployment levels across recent years.,comparison
+Rank the highest unemployment years.,ranking
+What were the lowest inflation years?,ranking
+Show the top 5 unemployment periods.,ranking
+Which years had the highest GDP growth?,ranking
+Rank the lowest federal funds rate periods.,ranking
+What were the worst unemployment months?,ranking
+Top inflation years since 2000.,ranking
+Rank unemployment years from lowest to highest.,ranking
+Which periods had the strongest payroll growth?,ranking
+List the highest CPI periods.,ranking
+Rank the lowest unemployment years since 2010.,ranking
+Rank the highest inflation periods since 2020.,ranking
+Show the bottom 10 GDP years.,ranking
+What are the top 5 federal funds rate years?,ranking
+List the lowest payroll growth periods.,ranking
+Which years had the smallest unemployment averages?,ranking
+Rank CPI years by average value.,ranking
+Show the highest unemployment months after 2020.,ranking
+Which periods had the lowest interest rates?,ranking
+Rank GDP quarters from highest to lowest.,ranking
+List the top 10 years for inflation.,ranking
+What were the highest average unemployment years since 2000?,ranking
+Rank payroll employment years by average level.,ranking
+Which years had the lowest CPI values?,ranking
+Show the highest federal funds rate months.,ranking
+Rank unemployment periods by average rate.,ranking
+What are the lowest GDP periods in the dataset?,ranking
+List the strongest payroll years since 2015.,ranking
+Which years ranked highest for CPI?,ranking
+Rank the worst unemployment years since 2010.,ranking
+Show the top years for GDP levels.,ranking
+Which months had the lowest unemployment?,ranking
+Rank inflation periods from highest to lowest.,ranking
+Show the bottom 5 federal funds rate years.,ranking
+Which years had the strongest employment levels?,ranking
+Rank the largest CPI periods.,ranking
+What are the highest payroll months?,ranking
+List the lowest unemployment years after 2015.,ranking
+Rank GDP periods by average value.,ranking
+Which years had the highest average federal funds rate?,ranking
+Show the top 3 unemployment years.,ranking
+What are the lowest inflation months?,ranking
+Rank the best unemployment years since 2010.,ranking
+List the highest interest rate periods after 2020.,ranking
+Which years had the highest payroll employment?,ranking
+Rank CPI periods from lowest to highest.,ranking
+Show the highest average unemployment periods.,ranking
+What were the lowest federal funds rate months?,ranking
+Rank the top 10 GDP quarters.,ranking
+Which periods had the largest average CPI?,ranking
+Which years had the most unemployment volatility?,volatility
+Show periods with the highest inflation variability.,volatility
+When was GDP growth most unstable?,volatility
+Analyze volatility in payroll growth.,volatility
+Which periods had the largest unemployment swings?,volatility
+Find the most variable inflation years.,volatility
+What years showed the greatest fluctuations in interest rates?,volatility
+Which decades had the highest unemployment variance?,volatility
+Identify unstable inflation periods.,volatility
+Which periods had the largest month-to-month unemployment changes?,volatility
+Show the most volatile CPI years.,volatility
+Which years had the highest standard deviation in unemployment?,volatility
+Find the largest swings in federal funds rate.,volatility
+Analyze variation in GDP over time.,volatility
+What periods had the most payroll volatility?,volatility
+Which years had the widest unemployment range?,volatility
+Show inflation periods with the largest variance.,volatility
+When did interest rates fluctuate the most?,volatility
+Find the years with the largest CPI swings.,volatility
+Which periods had unstable payroll employment?,volatility
+Rank years by unemployment volatility.,volatility
+Show the most variable GDP quarters.,volatility
+Which years had the highest CPI standard deviation?,volatility
+Find federal funds rate volatility since 2020.,volatility
+Which periods had large month-to-month changes in CPI?,volatility
+Analyze unemployment variance since 2010.,volatility
+Show the largest payroll fluctuations after 2015.,volatility
+What years had the biggest interest rate swings?,volatility
+Identify periods of high GDP variability.,volatility
+Which years had the largest unemployment range?,volatility
+Find the most unstable unemployment years after 2020.,volatility
+Show CPI volatility before and after 2020.,volatility
+Which periods had the most variable federal funds rate?,volatility
+Analyze monthly volatility in inflation.,volatility
+What were the most volatile years for payroll employment?,volatility
+Find the largest GDP fluctuations.,volatility
+Which years had high variance in unemployment?,volatility
+Show unstable interest rate periods.,volatility
+Analyze the range of unemployment by year.,volatility
+Which periods had the greatest inflation swings?,volatility
+Show volatility in CPI after 2021.,volatility
+What years had the largest payroll employment variation?,volatility
+Find unemployment periods with high standard deviation.,volatility
+Which periods had extreme interest rate movement?,volatility
+Analyze variance in federal funds rate since 2015.,volatility
+Show the most unstable GDP periods.,volatility
+Which years had the greatest monthly unemployment changes?,volatility
+Find the widest CPI ranges by year.,volatility
+Rank inflation volatility since 2010.,volatility
+Which years showed the strongest fluctuations in payrolls?,volatility
+Is unemployment correlated with inflation?,correlation
+Measure correlation between CPI and unemployment.,correlation
+How related are payrolls and GDP?,correlation
+Analyze the correlation between interest rates and unemployment.,correlation
+Are inflation and federal funds rate correlated?,correlation
+What is the relationship between GDP and payroll growth?,correlation
+Compute correlation between unemployment and CPI.,correlation
+How strongly are unemployment and interest rates associated?,correlation
+Examine the relationship between GDP and inflation.,correlation
+Is there a statistical relationship between payrolls and unemployment?,correlation
+Calculate correlation between FEDFUNDS and CPI.,correlation
+Are GDP and unemployment statistically associated?,correlation
+Measure the correlation between payroll employment and inflation.,correlation
+How related are CPI and federal funds rate?,correlation
+Compute the association between GDP and PAYEMS.,correlation
+Is unemployment negatively correlated with payrolls?,correlation
+Analyze relationship between interest rates and inflation.,correlation
+Check correlation between GDP and CPI.,correlation
+How strongly related are unemployment and federal funds rate?,correlation
+Find correlation between PAYEMS and UNRATE.,correlation
+Are payrolls and CPI correlated over time?,correlation
+Measure statistical association between GDP and unemployment.,correlation
+Compute Pearson correlation for inflation and interest rates.,correlation
+How related are federal funds rate and unemployment since 2020?,correlation
+Examine correlation between CPI and GDP.,correlation
+Is there a relationship between inflation and payrolls?,correlation
+Calculate the correlation matrix for unemployment and CPI.,correlation
+How strongly are GDP and payroll employment associated?,correlation
+Are interest rates associated with CPI movements?,correlation
+Check whether unemployment and inflation move together.,correlation
+Measure correlation between PAYEMS and GDP.,correlation
+Analyze association between unemployment and payroll growth.,correlation
+Compute correlation between federal funds rate and GDP.,correlation
+Is CPI statistically related to unemployment?,correlation
+How associated are inflation and interest rates?,correlation
+Find relationship between GDP and CPI since 2010.,correlation
+Check correlation between unemployment and FEDFUNDS.,correlation
+Are payrolls correlated with unemployment after 2020?,correlation
+Compute statistical relationship between CPI and PAYEMS.,correlation
+How related are interest rates and GDP?,correlation
+Analyze correlation across economic indicators.,correlation
+Is there a measurable association between inflation and unemployment?,correlation
+Measure correlation between GDP and federal funds rate.,correlation
+Check if CPI and interest rates are related.,correlation
+Compute relationship between payroll employment and unemployment.,correlation
+Are unemployment and GDP correlated?,correlation
+How strong is the correlation between inflation and GDP?,correlation
+Analyze statistical relationship between PAYEMS and CPI.,correlation
+Measure the association between unemployment and interest rates.,correlation
+"Compute correlations among UNRATE, CPIAUCSL, and FEDFUNDS.",correlation
+Why did unemployment spike in 2020?,unsupported
+Predict inflation next year.,unsupported
+Should the Fed cut rates?,unsupported
+What caused the rise in unemployment?,unsupported
+Forecast GDP growth for 2027.,unsupported
+What policy should reduce inflation?,unsupported
+Will unemployment improve next year?,unsupported
+Explain why payrolls dropped after COVID.,unsupported
+Recommend actions to lower inflation.,unsupported
+What will interest rates look like next year?,unsupported
+Why did inflation increase after 2020?,unsupported
+What caused GDP to fall?,unsupported
+Should policymakers respond to unemployment?,unsupported
+Predict the next recession using this data.,unsupported
+Will CPI go down next year?,unsupported
+What should businesses do about interest rates?,unsupported
+Explain the cause of the federal funds rate increase.,unsupported
+Forecast unemployment for 2028.,unsupported
+Should I invest based on GDP trends?,unsupported
+What caused payroll growth to slow?,unsupported
+Why did CPI rise in 2021?,unsupported
+Recommend a policy response to inflation.,unsupported
+Will the labor market get stronger next year?,unsupported
+What will GDP be in five years?,unsupported
+Should the Fed raise rates?,unsupported
+Explain why unemployment changed after COVID.,unsupported
+Predict payroll employment next quarter.,unsupported
+What caused interest rates to move?,unsupported
+Should companies hire more workers?,unsupported
+Will inflation keep falling?,unsupported
+Forecast federal funds rate for next year.,unsupported
+Why did GDP growth accelerate?,unsupported
+What action should be taken to reduce unemployment?,unsupported
+Explain the macroeconomic cause of CPI changes.,unsupported
+Will payrolls recover next month?,unsupported
+Should investors worry about inflation?,unsupported
+What caused unemployment to decline?,unsupported
+Predict CPI for 2030.,unsupported
+Should the government intervene?,unsupported
+Explain why interest rates were high.,unsupported
+What will happen to unemployment in 2027?,unsupported
+Recommend how to respond to GDP weakness.,unsupported
+Why did payrolls change in 2020?,unsupported
+Forecast inflation using CPI.,unsupported
+Should the Fed change policy?,unsupported
+What caused federal funds rate volatility?,unsupported
+Will GDP grow faster next year?,unsupported
+Explain the cause of payroll changes.,unsupported
+What actions should lower unemployment?,unsupported
+Predict the labor market outlook.,unsupported

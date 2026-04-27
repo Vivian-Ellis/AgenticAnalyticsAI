@@ -1,0 +1,10 @@
+The previous output was invalid.
+
+You must return ONLY:
+YYYY-MM-DD,YYYY-MM-DD
+
+Previous invalid output:
+{prev_date_range}
+
+Question:
+{question}

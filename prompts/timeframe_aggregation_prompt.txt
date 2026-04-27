@@ -1,0 +1,17 @@
+Task: 
+Your task is to determine the aggregation level of the date range from the given statement. 
+
+Assumptions:
+- The part to extract must be one of the following:
+-DAY
+-WEEK
+-MONTH
+-QUARTER
+-YEAR
+-YEAR_MONTH
+
+Output Rules: 
+- Return ONLY one value in the list [DAY,WEEK,MONTH,QUARTER,YEAR,YEAR_MONTH] 
+- Do not include labels, explanations, bullets, or additional text. 
+
+Statement: {question}

@@ -1,0 +1,61 @@
+Determine the most appropriate statistical methodology for each provided statement.
+
+Classify each statement into:
+
+1. a comparison_type
+2. the most appropriate statistical_test from the provided stat_test_plan
+
+Use ONLY statistical methods from the provided stat_test_plan.
+
+Intent Assumptions:
+
+* The intent of every statement is ALWAYS comparison.
+* You are ONLY determining the statistical methodology.
+* Use ONLY ONE comparison_type and ONE statistical_test per statement.
+
+Group Assumptions:
+
+* The grouping time grain has already been determined to be:
+  {date_grain}
+* The number of groups is:
+  N={num_groups}
+* Do NOT infer or modify the grouping granularity.
+* Do NOT infer the number of groups.
+* Use:
+
+  * "2_groups" tests when N == 2
+  * "3plus_groups" tests when N >= 3
+
+Important Routing Rules:
+
+* For ambiguous comparisons involving two variables across time, trends, movements, associations, or co-movement, route to relationship_comparison.
+* For explicit averages, means, levels, rates, grouped periods, years, windows, or categories, route to average_comparison.
+* For relationship_comparison:
+
+  * Use correlation by default.
+  * Use linear_regression ONLY if the statement explicitly references prediction, modeling, explanation, dependence, impact, effect, or forecasting.
+* If multiple comparison types could reasonably apply, select the highest-priority comparison type from routing_priority.
+
+routing_priority:
+{routing_priority}
+
+stat_test_plan:
+{stat_test_plan}
+
+statement:
+{statement}
+
+Do NOT:
+
+* explain reasoning
+* provide commentary
+* summarize
+* infer missing context
+* invent methodologies outside the provided stat_test_plan
+
+Return ONLY one row in the format:
+comparison_type,statistical_test
+
+Examples:
+average_comparison,welch_ttest
+relationship_comparison,correlation
