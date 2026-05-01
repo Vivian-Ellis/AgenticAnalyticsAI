@@ -1,7 +1,7 @@
 import sys
-sys.path.append("../src")
-import db
-import summaries
+sys.path.append("../src/")
+import DataBase.db as db
+import Narration.summaries as summaries
 import user_intent
 
 class DataPlanBuilder:

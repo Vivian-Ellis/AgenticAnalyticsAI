@@ -23,11 +23,18 @@ def build_spearman_correlation_analysis_prompt(question,context,corr_df,stats_df
         prompt = template.format(spearman_reason=spearman_reason,question=question,context=context,corr_df=corr_df,stats_df=stats_df)
     return prompt
 
-def build_ranking_analysis_prompt(question,context,df,ranked_df):
+def build_ranking_analysis_prompt(question,context,df,ranked_df,sort_field,ascending,n,aggregation_method,group_by):
     with open("../prompts/ranking_analysis_prompt.txt") as f:
         template = f.read()
-
-        prompt = template.format(question=question,df=df,context=context,ranked_df=ranked_df)
+        prompt = template.format(question=question,
+                                 df=df,
+                                 context=context,
+                                 ranked_df=ranked_df,
+                                 sort_field=sort_field,
+                                 ascending=ascending,
+                                 n=n,
+                                 aggregation_method=aggregation_method,
+                                 group_by=group_by)
     return prompt
 
 def build_ranking_method_prompt(question,series_semantics):
@@ -148,8 +155,8 @@ def build_context(series_ids):
 def run_comparison_analysis(question,context,comparison_type,statistical_test,df_preview,descriptive_statistics,inferential_statistics):
     return run_prompt(build_comparison_analysis_prompt(question,context,comparison_type,statistical_test,df_preview,descriptive_statistics,inferential_statistics))
 
-def run_ranking_analysis(question,context,df,ranked_df):
-    return run_prompt(build_ranking_analysis_prompt(question,context,df,ranked_df))
+def run_ranking_analysis(question,context,df,ranked_df,sort_field,ascending,n,aggregation_method,group_by):
+    return run_prompt(build_ranking_analysis_prompt(question,context,df,ranked_df,sort_field,ascending,n,aggregation_method,group_by))
 
 def run_pearson_correlation_analysis(question,context,df,ranked_df):
     return run_prompt(build_pearson_correlation_analysis_prompt(question,context,df,ranked_df))

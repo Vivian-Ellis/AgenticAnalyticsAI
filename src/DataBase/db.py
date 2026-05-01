@@ -51,7 +51,7 @@ def get_series_metadata(series_id=None):
         query = f"""
         SELECT
             series_id,
-            title,
+            split(title, ':')[1] as title,
             frequency,
             units,
             seasonal_adjustment,
@@ -67,7 +67,7 @@ def get_series_metadata(series_id=None):
         query = """
         SELECT
             series_id,
-            title,
+            split(title, ':')[1] as title,
             frequency,
             units,
             seasonal_adjustment,
