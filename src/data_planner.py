@@ -1,27 +1,23 @@
 import sys
 sys.path.append("../src")
-import db
-import summaries
+import DataBase.db as db
+import Narration.summaries as summaries
 import user_intent
 import time
 
 def build_data_plan(question):
     # ---------------------DATA PLAN-----------------
     # STEP 1 determine question intent via logreg
-    start = time.perf_counter()
     question_intent=user_intent.predict_intent(question)
 
     # STEP 2 determine what dataset to use via fuzzywuzzy
-    start = time.perf_counter()
     metadata=db.get_series_metadata()
     series_ids=user_intent.predict_series_intent(question,metadata)
 
     # STEP 3 determine the date aggregation grain
-    start = time.perf_counter()
     date_grain=user_intent.date_aggregation_grain_intent(question)
 
     # STEP 4 determine time frame of dataset via claude LLM & validate output
-    start = time.perf_counter()
     start_date, end_date=user_intent.timeline_intent(question,date_grain)
 
     DATA_PLANNER={

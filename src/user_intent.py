@@ -1,9 +1,9 @@
 import joblib
 import sys
 sys.path.append("../src")
-import db
+import DataBase.db as db
 from fuzzywuzzy import process
-import summaries
+import Narration.summaries as summaries
 import date_parser
 
 # Load from the saved file
