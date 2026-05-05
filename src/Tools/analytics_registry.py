@@ -10,7 +10,18 @@ from tool_registry import register_tool
         determining the appropriate ranking direction and number of results, aggregating the dataset, and 
         ranking grouped periods by the calculated metric. Generates a narrated summary of the ranked results 
         and returns a structured `RankingResult` object containing the rankings, metadata, and analysis outputs.""",
-    args=["data_loader"])
+    input_schema={
+        "type": "object",
+        "properties": {
+            "data_loader": {
+                "type": "object",
+                "description": "DataLoader object containing a DataPlan (from DataPlanBuilder) and analysis-ready metadata."
+            }
+        },
+        "required": ["data_loader"]
+    },
+    default_chart="ranking_bar"
+)
 def ranking_tool(data_loader):
     """
     Run ranking analysis.
@@ -25,7 +36,18 @@ def ranking_tool(data_loader):
     statistical properties of the data. Generates a narrated interpretation of the correlation results and 
     returns a structured `CorrelationResult` object containing the correlation matrix, selected method, 
     supporting diagnostics, and analysis outputs.""",
-    args=["data_loader"])
+    input_schema={
+        "type": "object",
+        "properties": {
+            "data_loader": {
+                "type": "object",
+                "description": "DataLoader object containing a DataPlan (from DataPlanBuilder) and analysis-ready metadata."
+            }
+        },
+        "required": ["data_loader"]
+    },
+    default_chart="correlation_scatter"
+)
 def correlation_tool(data_loader):
     """
     Run correlation analysis.
@@ -40,7 +62,19 @@ def correlation_tool(data_loader):
     and inferential statistics across grouped data, and generating a narrated interpretation of the results. Returns a structured 
     `ComparisonResult` object containing the comparison type, statistical test used, descriptive statistics, inferential outputs, 
     and generated analysis summary.""",
-    args=["data_loader"])
+    input_schema={
+        "type": "object",
+        "properties": {
+            "data_loader": {
+                "type": "object",
+                "description": "DataLoader object containing a DataPlan (from DataPlanBuilder) and analysis-ready metadata."
+            }
+        },
+        "required": ["data_loader"]
+    },
+    output_type= "ComparisonResult",
+    default_chart= "comparison_bar"
+)
 def comparison_tool(data_loader):
     """
     Run comparison analysis.

@@ -11,7 +11,7 @@ class AnalysisPlanner:
             "ranking": Ranking.RankingAnalysis(data_loader),
             "comparison": Comparison.ComparisonAnalysis(data_loader)
         }
-        analysis_results=None
+        self.analysis_results=None
 
     def run(self):
         intent = self.data_loader.data_plan.question_intent
