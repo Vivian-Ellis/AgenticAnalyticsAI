@@ -6,8 +6,19 @@ from fuzzywuzzy import process
 import Narration.summaries as summaries
 import date_parser
 
+import pandas as pd
+pd.set_option('display.max_colwidth', None)
+
 # Load from the saved file
 QUESTION_INTENT_MODEL = joblib.load('../data/log_regression_intent_classifier.joblib')
+
+SERIES_ALIASES = {
+    "CPIAUCSL": ["inflation"],
+    "UNRATE": ["jobless"],
+    "FEDFUNDS": ["interest"],
+    "GDP": ["economic output"],
+    "PAYEMS": ["nonfarm payroll"]
+}
 
 def predict_intent(question):
     """
@@ -36,14 +47,30 @@ def predict_series_intent(question,metadata):
     this function will return at most 3 of the highest matching datasets to use. 
     returns only the list of series_id of the datasets
     """
-    metadata["search_text"] = (metadata["series_id"] + " " + metadata["title"])
+    top_results=[]
 
+    question_lower = question.lower()
+
+    for series_id, aliases in SERIES_ALIASES.items():
+        # check series_id itself
+        if series_id.lower() in question_lower:
+            top_results.append(series_id)
+            continue
+
+        # check aliases
+        for alias in aliases:
+            if alias.lower() in question_lower:
+                top_results.append(series_id)
+                break
+
+    # now perform fuzzy matching
+    metadata["aliases"] = metadata["series_id"].map(lambda x: " ".join(SERIES_ALIASES.get(x, [])))    
+    metadata["search_text"] = (metadata["series_id"] + " " + metadata["title"])#+" "+metadata["aliases"])
     choice_map = dict(zip(metadata["search_text"], metadata["series_id"]))
     choices = metadata["search_text"].tolist()
 
     results = process.extract(question,choices,limit=3)
-
-    top_results=[]
+  
     for match, score in results:
         if score > 70:
             top_results.append(choice_map[match])
