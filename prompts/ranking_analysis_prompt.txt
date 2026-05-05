@@ -6,9 +6,14 @@ You are summarizing a ranking analysis performed on:
 {context}
 
 Ranking Metadata:
-
 * The ranking methodology has already been computed externally.
 * The provided Final Ranking dataframe represents the final ordered ranking output.
+* Sort field: {sort_field}
+* Sort ascending: {ascending}
+* Ranking count requested: {n}
+* Aggregation method: {aggregation_method}
+* Grouping field: {group_by}
+* Rank 1 is the first row of the Final Ranking dataframe.
 * Do NOT reinterpret, recompute, or modify the ranking methodology.
 
 Your Task:
