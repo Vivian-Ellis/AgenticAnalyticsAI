@@ -1,58 +1,29 @@
 import sys
 sys.path.append("../src")
 from plan.DataPipeline import DataPlanBuilder,DataLoader
-from plan.AnalysisPlanner import AnalysisPlanner
 from Analysis import Charts
+import tool_registry
+import analytics_registry
+# sys.path.append("../src/Orcestrator")
+from Orcestrator.agent_response import AgentResponse
+from Orcestrator.agent_validation import AgentValidator
 
-q=""
-data_plan = DataPlanBuilder(q).run()
-data_loader = DataLoader(data_plan)
-df=data_loader.run()
-ap=AnalysisPlanner(data_loader)
-results=ap.run()
-chart=Charts.Chart(results)
-chart.run()
+def run_agent(question):
+    data_plan = DataPlanBuilder(question).run()
+    AgentValidator.validate_plan(data_plan)
 
-# question="Rank GDP quarters from highest to lowest."
+    data_loader = DataLoader(data_plan)
+    df=data_loader.run()
+    AgentValidator.validate_data(data_loader)
 
-# data_plan = DataPlanBuilder(question).run()
+    tool = tool_registry.get_tool(data_loader.data_plan.question_intent)
+    AgentValidator.validate_tool(tool, data_loader)
 
-# data_loader = DataLoader(data_plan)
-# df=data_loader.run()
+    result = tool["function"](data_loader)
+    AgentValidator.validate_result(result)
 
+    chart_type = tool["default_chart"]
+    chart = Charts.Chart(result, chart_type)
+    chart_path = chart.run()
 
-# # do for all
-# df,dataset_context,DATA_PLANNER=data_planner.build_data_plan(question)
-
-# question_intent=DATA_PLANNER['DATA_PLANNER']
-
-# # if comparision (can do welch, anova, )
-# if question_intent=='comparison':
-#     comparison.run_comparison_analysis(df,question,DATA_PLANNER,dataset_context)
-
-# # if ranking
-# if question_intent=='ranking':
-#     ranking.run_ranking_analysis((df,question,DATA_PLANNER,dataset_context))
-
-# # if correlation (can do pearsons and spearmans)
-# if question_intent=='correlation':
-#     correlation.run_correlation_analysis(df,question,DATA_PLANNER,dataset_context)
-
-# if question_intent=='trend':
-#     print('under construction')
-#     #     "trend": {
-#     #     "default_stat": "mean",
-#     #     "default_computation": "aggregated_levels",
-#     #     "default_chart": "line"
-#     # },
-
-# if question_intent=='volatility':
-#     print('under construction')
-#     # "volatility": {
-#     #     "default_stat": "std",
-#     #     "default_computation": "percent_change",
-#     #     "default_chart": "bar"
-#     # },
-
-# if question_intent=='unsupported':
-#     print('under construction')
+    return AgentResponse(question, result, chart_path, data_plan, tool)
