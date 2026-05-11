@@ -99,7 +99,7 @@ def compute_df_aggregation(df,group_by_fields="date",computation="mean"):
     group_by_fields may be a string or list, such as:
     "date", ["year"], or ["year", "quarter"]
     """
-    df_agg=df.groupby(group_by_fields).agg(calculated_value=("value",computation)).reset_index()
+    df_agg=df.groupby(group_by_fields).agg(Value=("value",computation)).reset_index()
     return df_agg
 
 def parse_date(df):
