@@ -1,12 +1,14 @@
+from pathlib import Path
 import duckdb
 
-DB_PATH = "../data/fred_data.db"
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DB_PATH = PROJECT_ROOT / "data" / "fred_data.db"
 
 def get_connection():
     """
     Create and return a DuckDB connection.
     """
-    return duckdb.connect(DB_PATH)
+    return duckdb.connect(str(DB_PATH))
 
 def run_query(query):
     """

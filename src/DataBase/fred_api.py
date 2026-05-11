@@ -1,10 +1,13 @@
+from pathlib import Path
 import pandas as pd
 import requests
 from time import sleep
 import duckdb
 
-DB_PATH = "../data/fred_data.db"
-DATA_FILES_PATH = "../data"
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+DB_PATH = PROJECT_ROOT / "data" / "fred_data.db"
+DATA_FILES_PATH = PROJECT_ROOT / "data"
 
 def fetch_fred_data():
     # returns a pandas DF with "CPIAUCSL", "UNRATE", "FEDFUNDS","GDP","PAYEMS" datasets
@@ -45,12 +48,12 @@ def fetch_fred_data():
         all_meta_data_df.append(meta_data_df)
         sleep(0.2)  # gentle pause
 
-    fred_df = pd.concat(all_dfs, ignore_index=True)
-    fred_df.name="fred"
+    fred_data = pd.concat(all_dfs, ignore_index=True)
+    fred_data.name="fred"
     fred_meta_data_df = pd.concat(all_meta_data_df, ignore_index=True)
     fred_meta_data_df.name="fred_metadata"
 
-    return fred_df,fred_meta_data_df
+    return fred_data,fred_meta_data_df
 
 def insert_raw_data():
     con = duckdb.connect(DB_PATH)
@@ -70,9 +73,12 @@ def insert_raw_metadata():
     con.close()
 
 def save_csv_parquet(df):
-    df.to_csv(f'{DATA_FILES_PATH}/{df.name}.csv', index=False)
-    df.to_parquet(f'{DATA_FILES_PATH}/{df.name}.parquet', index=False)
-    print(f"Saved {DATA_FILES_PATH}/{df.name}.csv and {DATA_FILES_PATH}/{df.name}.parquet")
+    csv_path = DATA_FILES_PATH/f"{df.name}.csv"
+    parquet_path = DATA_FILES_PATH/f"{df.name}.parquet"
+    df.to_csv(csv_path, index=False)
+    df.to_parquet(parquet_path, index=False)
+    print(f"Saved {csv_path}")
+    print(f"Saved {parquet_path}")
 
 def clean_data():
     con = duckdb.connect(DB_PATH)
@@ -89,8 +95,10 @@ def clean_data():
     con.close()
 
 def build_fred_dataset():
-    fred_df,fred_meta_data_df=fetch_fred_data()
-    save_csv_parquet(fred_df)
+    fred_data,fred_meta_data_df=fetch_fred_data()
+    fred_data.name="fred_data"
+    fred_meta_data_df.name="fred_meta_data"
+    save_csv_parquet(fred_data)
     save_csv_parquet(fred_meta_data_df)
     insert_raw_data()
     insert_raw_metadata()
