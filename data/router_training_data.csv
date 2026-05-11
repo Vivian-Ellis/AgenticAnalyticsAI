@@ -1,0 +1,328 @@
+question,label
+How has unemployment changed since 2020?,analytics
+Show GDP trends over the last decade.,analytics
+Compare inflation and unemployment over time.,analytics
+Is GDP related to employment levels?,analytics
+Which years had the highest inflation?,analytics
+Rank GDP growth by year.,analytics
+Chart the Federal Funds Rate since 2008.,analytics
+How volatile has CPI been historically?,analytics
+Compare unemployment before and after 2020.,analytics
+Which periods had the weakest GDP?,analytics
+Analyze PAYEMS trends since 2000.,analytics
+How does CPI correlate with interest rates?,analytics
+Plot unemployment and inflation together.,analytics
+Which years had the lowest unemployment rate?,analytics
+Analyze GDP from 1990 onward.,analytics
+Compare GDP across decades.,analytics
+Did inflation rise after 2020?,analytics
+What is the relationship between CPI and FEDFUNDS?,analytics
+Show employment growth over time.,analytics
+Which quarters had the strongest GDP?,analytics
+Rank unemployment rates by year.,analytics
+Compare inflation before and after the financial crisis.,analytics
+How have interest rates changed since 1980?,analytics
+Plot GDP and unemployment on the same chart.,analytics
+Analyze long-term trends in FEDFUNDS.,analytics
+Did unemployment fall after 2021?,analytics
+Show the correlation between PAYEMS and GDP.,analytics
+Compare CPI before and after 2008.,analytics
+What years had the lowest federal funds rate?,analytics
+Run a trend analysis on the unemployment rate.,analytics
+Show me GDP over time.,analytics
+How does inflation move with interest rates?,analytics
+Rank inflation periods from highest to lowest.,analytics
+Compare employment growth by decade.,analytics
+Show a chart of CPI since 2015.,analytics
+Which years experienced peak inflation?,analytics
+Run correlation analysis between GDP and unemployment.,analytics
+How did GDP behave after COVID?,analytics
+Compare unemployment in the 1990s versus the 2020s.,analytics
+What patterns exist in employment data?,analytics
+Show me the strongest GDP quarters.,analytics
+Analyze long-term inflation trends.,analytics
+What is the correlation between CPI and UNRATE?,analytics
+Plot the unemployment rate.,analytics
+How has PAYEMS changed since 2000?,analytics
+Compare GDP before and after the financial crisis.,analytics
+Rank GDP declines by severity.,analytics
+Which periods had the highest interest rates?,analytics
+Analyze employment and inflation together.,analytics
+Show unemployment trends over the past 20 years.,analytics
+What about since 2020?,analytics
+What about GDP?,analytics
+Now compare that to inflation.,analytics
+Do the same for unemployment.,analytics
+What if we use quarterly data?,analytics
+What about after 2008?,analytics
+Can you chart that instead?,analytics
+Now rank those years.,analytics
+Compare it to employment.,analytics
+What about the federal funds rate?,analytics
+Show that over time.,analytics
+Can you run the same analysis for CPI?,analytics
+What happens if we look at the last decade?,analytics
+Can you compare those two series?,analytics
+Now show the trend.,analytics
+What about before COVID?,analytics
+Can you correlate that with GDP?,analytics
+Do that for PAYEMS too.,analytics
+How about since the financial crisis?,analytics
+Can you plot those results?,analytics
+Which of those periods were highest?,analytics
+Now use annual averages.,analytics
+Can you rerun that for UNRATE?,analytics
+What about interest rates?,analytics
+Show the relationship instead of the trend.,analytics
+What datasets are available?,metadata
+Show me the metadata.,metadata
+What date ranges are available for GDP?,metadata
+What are UNRATE start and end dates?,metadata
+Print all available series.,metadata
+What does PAYEMS represent?,metadata
+Show observation_start and observation_end.,metadata
+What frequency is GDP reported at?,metadata
+List the available FRED datasets.,metadata
+What units does CPI use?,metadata
+Show the metadata table.,metadata
+What dates are available for FEDFUNDS?,metadata
+Explain the unemployment dataset.,metadata
+What is the GDP series frequency?,metadata
+Tell me about CPIAUCSL.,metadata
+Show metadata for all datasets.,metadata
+What does FEDFUNDS measure?,metadata
+What economic indicators are loaded?,metadata
+What is the observation end for GDP?,metadata
+Describe the PAYEMS dataset.,metadata
+What is the start date for CPIAUCSL?,metadata
+List the frequencies for every dataset.,metadata
+Show available series IDs.,metadata
+What does UNRATE stand for?,metadata
+What metadata fields are available?,metadata
+How often is unemployment reported?,metadata
+What is the unit for GDP?,metadata
+Print the available metadata.,metadata
+What datasets can I analyze?,metadata
+What is the observation range for PAYEMS?,metadata
+Show metadata for FEDFUNDS.,metadata
+What does CPI measure?,metadata
+What is the date range for unemployment data?,metadata
+List all datasets with observation dates.,metadata
+What are the supported series?,metadata
+Explain the GDP dataset.,metadata
+What is the latest observation for CPI?,metadata
+Show me all series metadata.,metadata
+What seasonal adjustment does GDP use?,metadata
+What is the frequency of FEDFUNDS?,metadata
+Tell me about the available data.,metadata
+Which datasets are monthly?,metadata
+What economic datasets are in the app?,metadata
+Show me the series descriptions.,metadata
+What metadata do you have for CPIAUCSL?,metadata
+What columns exist in the metadata table?,metadata
+How far back does GDP data go?,metadata
+What is the observation start for FEDFUNDS?,metadata
+Print dataset descriptions.,metadata
+What datasets are currently supported?,metadata
+What's the date range for CPI?,metadata
+What are the observation dates for all series?,metadata
+Show each dataset's frequency and units.,metadata
+Which series are seasonally adjusted?,metadata
+What is the latest date available for UNRATE?,metadata
+What is the earliest date available for PAYEMS?,metadata
+What does the metadata say for GDP?,metadata
+Can you show the metadata columns?,metadata
+What are the start and end dates for all datasets?,metadata
+Which FRED series IDs are available?,metadata
+hi,greeting
+hello,greeting
+hey,greeting
+good morning,greeting
+good afternoon,greeting
+good evening,greeting
+how are you,greeting
+how r u today,greeting
+yo,greeting
+sup,greeting
+hiya,greeting
+hello there,greeting
+hey there,greeting
+what's up,greeting
+how's it going,greeting
+how are things,greeting
+nice to meet you,greeting
+morning,greeting
+afternoon,greeting
+evening,greeting
+hi bot,greeting
+hello bot,greeting
+hey assistant,greeting
+greetings,greeting
+hey buddy,greeting
+hii,greeting
+hellooo,greeting
+heyyy,greeting
+how are you doing,greeting
+what's going on,greeting
+hope you're doing well,greeting
+howdy,greeting
+wassup,greeting
+good to see you,greeting
+hello again,greeting
+hi again,greeting
+hey friend,greeting
+are you there,greeting
+checking in,greeting
+hey how are you,greeting
+hello how are you,greeting
+hiya there,greeting
+what's new,greeting
+bonjour,greeting
+hola,greeting
+hey hey,greeting
+good day,greeting
+hello assistant,greeting
+hi there,greeting
+hello world,greeting
+how r u todauy,greeting
+how are u,greeting
+how ya doing,greeting
+you there?,greeting
+hi fred bot,greeting
+hey fred assistant,greeting
+hello fred app,greeting
+how's your day,greeting
+how is it going today,greeting
+hey what's up,greeting
+What can you do?,other
+What are your capabilities?,other
+How can this app help me?,other
+What analyses do you support?,other
+Can you generate charts?,other
+What kinds of questions can I ask?,other
+What is this app for?,other
+What are you capable of?,other
+What can this assistant analyze?,other
+Can you compare datasets?,other
+Do you support correlations?,other
+Can you do trend analysis?,other
+What features are available?,other
+Can you rank datasets?,other
+What types of analytics are supported?,other
+Can you create visualizations?,other
+Do you support statistical analysis?,other
+How should I use this app?,other
+What is this analytics bot capable of?,other
+Can you analyze economic data?,other
+What can I ask you?,other
+Do you support charts and graphs?,other
+What analyses are available?,other
+What data analysis tools do you support?,other
+What can this FRED bot do?,other
+What supported analyses exist?,other
+What functionality is available?,other
+What are the app's features?,other
+What is supported in this app?,other
+What are your supported capabilities?,other
+What analytics workflows are supported?,other
+What types of economic analysis do you support?,other
+What's the weather today?,other
+Who won the football game?,other
+Write me a poem.,other
+What's the latest news?,other
+Can you browse the web?,other
+Give me stock trading advice.,other
+Who is the president?,other
+Tell me a joke.,other
+What should I eat tonight?,other
+Write Python code for a website.,other
+Can you summarize this PDF?,other
+What's the capital of France?,other
+Generate an image.,other
+How do I fix my sink?,other
+Tell me today's headlines.,other
+Can you search Google?,other
+What's happening in the stock market today?,other
+Who won the election?,other
+Can you analyze my uploaded spreadsheet?,other
+Write a cover letter.,other
+What's the best laptop?,other
+Can you forecast Bitcoin prices?,other
+How do I lose weight?,other
+Translate this into Spanish.,other
+Who are you voting for?,other
+What movies are out right now?,other
+How do I cook pasta?,other
+Can you access the internet?,other
+What's the weather in Madison?,other
+Give me legal advice.,other
+Can you review my resume?,other
+What's today's date?,other
+Who is Taylor Swift?,other
+Can you summarize the news?,other
+What should I invest in?,other
+Write me a story.,other
+What's the best phone right now?,other
+How do I build a neural network?,other
+Generate a logo.,other
+What is quantum computing?,other
+Can you answer trivia questions?,other
+What restaurants are near me?,other
+Can you analyze sports statistics?,other
+Help me with chemistry homework.,other
+What's the traffic like today?,other
+Can you scrape websites?,other
+Tell me about world history.,other
+What songs are popular right now?,other
+Can you give medical advice?,other
+Who won the Oscars?,other
+I don't understand this chart.,other
+Why did the analysis fail?,other
+That output looks strange.,other
+Can you explain the result?,other
+The chart didn't render.,other
+Why is the unemployment chart empty?,other
+That doesn't seem right.,other
+Can you clarify that result?,other
+The app is running slowly.,other
+I think the data looks wrong.,other
+Why did GDP disappear from the chart?,other
+The output formatting looks weird.,other
+Can you explain what happened?,other
+That analysis seems incorrect.,other
+The chart labels overlap.,other
+I got an error message.,other
+The app crashed.,other
+Why is the chart blank?,other
+Can you explain the significance test?,other
+This visualization is confusing.,other
+Why is the response taking so long?,other
+The metadata output looks odd.,other
+Can you simplify that explanation?,other
+The graph colors are hard to read.,other
+What does this p-value mean?,other
+The formatting broke.,other
+The analysis response is too verbose.,other
+Can you restate that more simply?,other
+The response seems repetitive.,other
+The app feels slow today.,other
+Why is the trend chart missing points?,other
+The rankings look incorrect.,other
+I don't understand the correlation result.,other
+The markdown formatting looks broken.,other
+The response formatting is weird.,other
+Can you explain the chart axes?,other
+The chart isn't loading.,other
+Why is the chart cutoff?,other
+Can you make the response shorter?,other
+The table formatting broke.,other
+What does this analysis mean?,other
+Can you explain this output in plain English?,other
+The lines on the chart overlap too much.,other
+The app keeps spinning.,other
+Why did the model choose that analysis?,other
+Can you clarify the comparison result?,other
+This output is difficult to read.,other
+Why is the chart taking so long?,other
+The response is too technical.,other
+Can you explain the findings more clearly?,other
