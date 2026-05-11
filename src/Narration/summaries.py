@@ -13,6 +13,7 @@ import DataBase.db as db
 # print("KEY LOADED:", os.getenv("ANTHROPIC_API_KEY") is not None)
 
 PROMPTS_DIR = Path(__file__).resolve().parents[2] / "prompts"
+client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 def build_pearson_correlation_analysis_prompt(question,context,corr_df,stats_df):
     with open(PROMPTS_DIR / "pearson_correlation_analysis_prompt.txt") as f:
@@ -129,12 +130,24 @@ def build_timeframe_aggregation_prompt(question):
         prompt = template.format(question=question)
     return prompt
 
-def run_prompt(prompt):
-    api_key = os.getenv("ANTHROPIC_API_KEY")
-    client = anthropic.Anthropic(api_key=api_key)
+def build_question_router_prompt(question,recent_history):
+    with open(PROMPTS_DIR / "question_router_prompt.txt") as f:
+        template = f.read()
+
+        prompt = template.format(question=question,recent_history=recent_history)
+    return prompt
+
+def build_general_assistant_prompt(question,available_series,recent_history=None):
+    with open(PROMPTS_DIR / "general_assistant_prompt.txt") as f:
+        template = f.read()
+
+        prompt = template.format(question=question,available_series=available_series,recent_history=recent_history)
+    return prompt
+
+def run_prompt(prompt,max_tokens=500):
     message = client.messages.create(
         model="claude-haiku-4-5-20251001",
-        max_tokens=1000,
+        max_tokens=max_tokens,
         messages=[
             {
                 "role": "user",
@@ -169,3 +182,9 @@ def run_pearson_correlation_analysis(question,context,df,ranked_df):
 
 def run_spearman_correlation_analysis(question,context,df,ranked_df,spearman_reason):
     return run_prompt(build_spearman_correlation_analysis_prompt(question,context,df,ranked_df,spearman_reason))
+
+def run_question_router(question,recent_history=None,max_tokens=10):
+    return run_prompt(build_question_router_prompt(question,recent_history,max_tokens))
+
+def run_general_assistant(question,available_series,recent_history=None,max_tokens=250):
+    return run_prompt(build_general_assistant_prompt(question,available_series,recent_history),max_tokens)
