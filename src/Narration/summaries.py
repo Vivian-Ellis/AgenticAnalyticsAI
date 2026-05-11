@@ -1,30 +1,35 @@
-from dotenv import load_dotenv
 from pathlib import Path
+import os
 import anthropic
 import DataBase.db as db
+# from dotenv import load_dotenv
 
-ROOT_DIR = Path(__file__).resolve().parents[1]
+# ROOT_DIR = Path(__file__).resolve().parents[2]
 
-load_dotenv(ROOT_DIR / ".env")
+# load_dotenv(ROOT_DIR / ".env", override=True)
 
-client = anthropic.Anthropic()
+# print("ROOT_DIR:", ROOT_DIR)
+# print("ENV EXISTS:", (ROOT_DIR / ".env").exists())
+# print("KEY LOADED:", os.getenv("ANTHROPIC_API_KEY") is not None)
+
+PROMPTS_DIR = Path(__file__).resolve().parents[2] / "prompts"
 
 def build_pearson_correlation_analysis_prompt(question,context,corr_df,stats_df):
-    with open("../prompts/pearson_correlation_analysis_prompt.txt") as f:
+    with open(PROMPTS_DIR / "pearson_correlation_analysis_prompt.txt") as f:
         template = f.read()
 
         prompt = template.format(question=question,context=context,corr_df=corr_df,stats_df=stats_df)
     return prompt
 
 def build_spearman_correlation_analysis_prompt(question,context,corr_df,stats_df,spearman_reason):
-    with open("../prompts/spearman_correlation_analysis_prompt.txt") as f:
+    with open(PROMPTS_DIR / "spearman_correlation_analysis_prompt.txt") as f:
         template = f.read()
 
         prompt = template.format(spearman_reason=spearman_reason,question=question,context=context,corr_df=corr_df,stats_df=stats_df)
     return prompt
 
 def build_ranking_analysis_prompt(question,context,df,ranked_df,sort_field,ascending,n,aggregation_method,group_by):
-    with open("../prompts/ranking_analysis_prompt.txt") as f:
+    with open(PROMPTS_DIR / "ranking_analysis_prompt.txt") as f:
         template = f.read()
         prompt = template.format(question=question,
                                  df=df,
@@ -38,14 +43,14 @@ def build_ranking_analysis_prompt(question,context,df,ranked_df,sort_field,ascen
     return prompt
 
 def build_ranking_method_prompt(question,series_semantics):
-    with open("../prompts/ranking_method_prompt.txt") as f:
+    with open(PROMPTS_DIR / "ranking_method_prompt.txt") as f:
         template = f.read()
 
         prompt = template.format(question=question,series_semantics=series_semantics)
     return prompt
 
 def build_comparison_method_prompt(question,date_grain,num_groups,routing_priority,stat_test_plan):
-    with open("../prompts/comparison_method_prompt.txt") as f:
+    with open(PROMPTS_DIR / "comparison_method_prompt.txt") as f:
         template = f.read()  
         prompt = template.format(date_grain=date_grain,
                                  num_groups=num_groups,
@@ -55,7 +60,7 @@ def build_comparison_method_prompt(question,date_grain,num_groups,routing_priori
     return prompt
 
 def build_comparison_analysis_prompt(question,context,comparison_type,statistical_test,df_preview,descriptive_statistics,inferential_statistics):
-    with open("../prompts/comparison_analysis_prompt.txt") as f:
+    with open(PROMPTS_DIR / "comparison_analysis_prompt.txt") as f:
         template = f.read()  
         prompt = template.format(question=question,
                                  context=context,
@@ -104,7 +109,7 @@ Return the following items:
         """
     
 def build_timeframe_prompt(question,todays_date,aggregation_period):
-    with open("../prompts/timeframe_prompt.txt") as f:
+    with open(PROMPTS_DIR / "timeframe_prompt.txt") as f:
         template = f.read()  
         prompt = template.format(todays_date=todays_date,
                                  aggregation_period=aggregation_period,
@@ -112,22 +117,24 @@ def build_timeframe_prompt(question,todays_date,aggregation_period):
     return prompt
 
 def timeframe_validation_failed_prompt(question,prev_date_range):
-    with open("../prompts/timeframe_validation_failed_prompt.txt") as f:
+    with open(PROMPTS_DIR / "timeframe_validation_failed_prompt.txt") as f:
         template = f.read()  
         prompt = template.format(question=question,
                                  prev_date_range=prev_date_range)
     return prompt
 
 def build_timeframe_aggregation_prompt(question):
-    with open("../prompts/timeframe_aggregation_prompt.txt") as f:
+    with open(PROMPTS_DIR / "timeframe_aggregation_prompt.txt", "r", encoding="utf-8") as f:
         template = f.read()  
         prompt = template.format(question=question)
     return prompt
 
 def run_prompt(prompt):
+    api_key = os.getenv("ANTHROPIC_API_KEY")
+    client = anthropic.Anthropic(api_key=api_key)
     message = client.messages.create(
         model="claude-haiku-4-5-20251001",
-        max_tokens=500,
+        max_tokens=1000,
         messages=[
             {
                 "role": "user",
@@ -144,7 +151,6 @@ def build_context(series_ids):
 
     for series in series_ids:
         metadata=db.get_series_metadata(series_id=series)
-
         context+=f"""This is the {metadata['title'][0]} dataset. 
 
         About the dataset:
