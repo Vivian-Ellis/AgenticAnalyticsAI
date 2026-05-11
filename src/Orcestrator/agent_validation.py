@@ -1,6 +1,6 @@
 import sys
 sys.path.append("../src")
-import tool_registry
+from Tools import tool_registry
 import pandas as pd
 
 class AgentValidator:
