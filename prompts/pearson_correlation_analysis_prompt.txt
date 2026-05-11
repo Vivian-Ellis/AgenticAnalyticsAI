@@ -45,14 +45,14 @@ Optional Supporting Statistics:
 
 Return the following items:
 
-1. Analytical Summary
+Analytical Summary
 - Write a concise 2-3 sentence analytical correlation summary.
 
-2. Evidence-Based Insights
+Evidence-Based Insights
 - Return exactly 3 bullet points.
 - Keep insights descriptive, coefficient-based, and evidence-based.
 - Describe both the direction and relative strength of relationships where appropriate.
 - Do NOT speculate.
 
-3. Analysis Limitation
+Analysis Limitation
 - Return exactly 1 limitation or caution grounded ONLY in the provided outputs.

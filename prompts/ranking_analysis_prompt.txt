@@ -49,7 +49,7 @@ Final Ranking:
 
 Return the following items:
 
-1. Analytical Summary
+Analytical Summary
 
 * Write a concise 2-3 sentence analytical ranking summary.
 * Focus on:
@@ -58,12 +58,12 @@ Return the following items:
   * lowest-ranked observations
   * relative ordering patterns
 
-2. Evidence-Based Insights
+Evidence-Based Insights
 
 * Return exactly 3 bullet points.
 * Keep insights descriptive, ranking-based, and evidence-based.
 * Do NOT speculate.
 
-3. Analysis Limitation
+Analysis Limitation
 
 * Return exactly 1 limitation or caution grounded ONLY in the provided data or outputs.
