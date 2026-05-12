@@ -1,74 +1,114 @@
 import sys
-sys.path.append("../src")
-import analysis
-import summaries
+sys.path.append("../src/")
+import Analysis.analysis as analysis
+import Narration.summaries as summaries
 from scipy.stats import shapiro
 import numpy as np
+from Analysis.AnalysisResults import CorrelationResult
 
-SPEARMAN_REASON=[]
-CORR_METHOD='pearson'
+class CorrelationAnalysis:
+    def __init__(self,data_loader):
+        self.data_loader=data_loader
+        self.spearman_reason=[]
+        self.corr_method='pearson'
+        self.corr_df=None
+        self.summary_narration=None
+        self.original_df=None
 
-def update_CORR_METHOD(value):
-    global CORR_METHOD
-    CORR_METHOD = value
+    def shapiro_normality_test(self,data):
+        # The Shapiro-Wilk will be used to test for normailty where:
+        # H_0 : the sample is drawn from a normally distributed population
+        # H_1 : the sample is drawn from a population that is not normally distributed
+        # Let the threshold for significance be 0.01 so that if p_value < 0.01, I rejected the null hypothesis and conclude that the data is not normally distributed.
+        stat, p = shapiro(data)
 
-def update_SPEARMAN_REASON(value):
-    global SPEARMAN_REASON
-    SPEARMAN_REASON.append(value)
+        # let the significance level be 0.01
+        alpha = 0.01
 
-def shapiro_normality_test(data):
-    # The Shapiro-Wilk will be used to test for normailty where:
-    # H_0 : the sample is drawn from a normally distributed population
-    # H_1 : the sample is drawn from a population that is not normally distributed
-    # Let the threshold for significance be 0.01 so that if p_value < 0.01, I rejected the null hypothesis and conclude that the data is not normally distributed.
-    stat, p = shapiro(data)
-    # print('Statistics=%.3f, p=%.5f' % (stat, p))
-    # let the significance level be 0.01
-    alpha = 0.01
-    if p > alpha: #fail to reject null hypothesis, normal
-        # print('normally distributed (fail to reject the H_0)')
-        return True
-    else: #reject null hypothesis, not normal.
-        # print('NOT normally distributed (reject the H_0)')
-        return False
+        if p > alpha: #fail to reject null hypothesis, normal
+            return True
+        else: #reject null hypothesis, not normal.
+            return False
 
-def find_outliers(data):
-    Q1 = data.quantile(0.25)
-    Q3 = data.quantile(0.75)
-    IQR = Q3 - Q1
-    lower_bound = Q1 - 1.5 * IQR
-    upper_bound = Q3 + 1.5 * IQR
-    outliers = data[(data < lower_bound) | (data > upper_bound)]
-    return len(outliers)
+    def find_outliers(self,data):
+        Q1 = data.quantile(0.25)
+        Q3 = data.quantile(0.75)
+        IQR = Q3 - Q1
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+        outliers = data[(data < lower_bound) | (data > upper_bound)]
+        return len(outliers)
 
-def calculate_correlation(compare_df,DATA_PLANNER):
-    numeric_df = compare_df.select_dtypes(include=[np.number])
-    for series in DATA_PLANNER['series_ids']:
-        # if any outliers switch to spearman
-        if find_outliers(compare_df[series]) > 0:
-            update_CORR_METHOD("spearman")
-            update_SPEARMAN_REASON(f"{series} contained detected outliers.")
+    def calculate_correlation(self,compare_df):
+        numeric_df = compare_df.select_dtypes(include=[np.number])
 
-        # if non-noraml switch to spearman
-        if shapiro_normality_test(compare_df[series]) == False:
-            update_CORR_METHOD("spearman")
-            update_SPEARMAN_REASON(f"{series} violated the configured normality threshold.")
+        for series in self.data_loader.data_plan.series_ids:
 
-    corr_df=numeric_df.corr(method=CORR_METHOD)
-    corr_df.index.name = None
-    return corr_df
+            # if any outliers switch to spearman
+            if self.find_outliers(compare_df[series]) > 0:
+                self.corr_method="spearman"
+                self.spearman_reason.append(f"{series} contained detected outliers.")
 
-def run_correlation_analysis(df,question,DATA_PLANNER,dataset_context):
-    # STEP 1 get the aggregate df
-    stats_df=analysis.compute_df_aggregation(df,group_by_fields=["series_id",DATA_PLANNER['date_grain']],computation="mean")
-    # STEP 2 create the wide df
-    compare_df=analysis.compare_series(df,index_field="date",columns_field="series_id",value_field="value")
-    # STEP 3 compute appropriate correlation
-    corr_df=calculate_correlation(compare_df,DATA_PLANNER)
+            # if non-noraml switch to spearman
+            if self.shapiro_normality_test(compare_df[series]) == False:
+                self.corr_method="spearman"
+                self.spearman_reason.append(f"{series} violated the configured normality threshold.")
 
-    #STEP 4 send results to claude & return string
-    if CORR_METHOD=='pearson':
-        return summaries.run_pearson_correlation_analysis(question,dataset_context,corr_df,stats_df)
-    if CORR_METHOD=='spearman':
-        spearman_reason="\n".join(SPEARMAN_REASON)
-        return summaries.run_spearman_correlation_analysis(question,dataset_context,corr_df,stats_df,spearman_reason)
+        corr_df=numeric_df.corr(method=self.corr_method)
+        corr_df.index.name = None
+
+        self.corr_df=corr_df
+
+        return corr_df
+
+    def run_analysis(self):
+        df=self.data_loader.data.copy()
+
+        # STEP 1 get the aggregate df
+        self.stats_df=analysis.compute_df_aggregation(
+            df,
+            group_by_fields=["series_id",self.data_loader.data_plan.date_grain],
+            computation="mean"
+        )
+
+        # STEP 2 create the wide df
+        self.original_df=analysis.compare_series(
+            df,
+            index_field="date",
+            columns_field="series_id",
+            value_field="value"
+        )
+
+        # STEP 3 compute appropriate correlation
+        self.corr_df=self.calculate_correlation(self.original_df)
+
+        #STEP 4 send results to claude & return string
+        if self.corr_method=='pearson':
+            self.summary_narration=summaries.run_pearson_correlation_analysis(
+                self.data_loader.data_plan.question,
+                self.data_loader.data_plan.dataset_context,
+                self.corr_df,
+                self.original_df
+            )
+
+        if self.corr_method=='spearman':
+            spearman_reason="\n".join(self.spearman_reason)
+
+            self.summary_narration=summaries.run_spearman_correlation_analysis(
+                self.data_loader.data_plan.question,
+                self.data_loader.data_plan.dataset_context,
+                self.corr_df,
+                self.stats_df,
+                spearman_reason
+            )
+
+        return CorrelationResult(
+                    question=self.data_loader.data_plan.question,
+                    intent=self.data_loader.data_plan.question_intent,
+                    series_ids=self.data_loader.data_plan.series_ids,
+                    date_grain=self.data_loader.data_plan.date_grain,
+                    summary_narration=self.summary_narration,
+                    corr_df=self.corr_df,
+                    original_df=self.original_df,
+                    corr_method=self.corr_method,
+                    spearman_reason=self.spearman_reason)

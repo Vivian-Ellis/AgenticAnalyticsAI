@@ -2,15 +2,6 @@ from pathlib import Path
 import os
 import anthropic
 import DataBase.db as db
-# from dotenv import load_dotenv
-
-# ROOT_DIR = Path(__file__).resolve().parents[2]
-
-# load_dotenv(ROOT_DIR / ".env", override=True)
-
-# print("ROOT_DIR:", ROOT_DIR)
-# print("ENV EXISTS:", (ROOT_DIR / ".env").exists())
-# print("KEY LOADED:", os.getenv("ANTHROPIC_API_KEY") is not None)
 
 PROMPTS_DIR = Path(__file__).resolve().parents[2] / "prompts"
 client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))

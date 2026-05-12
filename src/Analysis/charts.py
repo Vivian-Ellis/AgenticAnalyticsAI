@@ -141,7 +141,6 @@ class Bar:
         table_fig.xaxis.minor_tick_line_color = None
         table_fig.yaxis.major_tick_line_color = None
         table_fig.yaxis.minor_tick_line_color = None
-
         # optional numeric formatting
         table_fig.yaxis[0].formatter = NumeralTickFormatter(format="0.00")
         table_fig.add_tools(

@@ -4,9 +4,6 @@ import DataBase.db as db
 import Narration.summaries as summaries
 import user_intent
 
-print("DB MODULE FILE:", db.__file__)
-print("DB PATH:", db.DB_PATH)
-
 class DataPlanBuilder:
     def __init__(self,question):
         self.question=question
