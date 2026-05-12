@@ -15,6 +15,7 @@ import orcestrator
 import html
 import DataBase.db as db
 from Orcestrator.questionrouter import route_message
+from streamlit_bokeh import streamlit_bokeh
 
 @st.cache_data(show_spinner=False)
 def load_metadata():
@@ -35,6 +36,21 @@ MODEL_PATH = os.path.abspath(
     )
 )
 ROUTING_MODEL = joblib.load(MODEL_PATH)
+
+MONTH_LABELS = {
+    1: "Jan",
+    2: "Feb",
+    3: "Mar",
+    4: "Apr",
+    5: "May",
+    6: "Jun",
+    7: "Jul",
+    8: "Aug",
+    9: "Sep",
+    10: "Oct",
+    11: "Nov",
+    12: "Dec",
+}
 
 def question_routing(user_input, chat_history=None):
     route = ROUTING_MODEL.predict([user_input])[0]
@@ -185,6 +201,32 @@ st.markdown(
         color: #756963 !important;
     }
 
+    
+    /* dataframe container */
+    [data-testid="stDataFrame"] {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    /* header cells */
+    [data-testid="stDataFrame"] [role="columnheader"] {
+        background-color: #EAD7E3 !important;
+        color: #2B2B2B !important;
+        font-weight: 600 !important;
+        border-bottom: 1px solid #F0E7E2 !important;
+    }
+
+    /* optional row styling */
+    [data-testid="stDataFrame"] [role="gridcell"] {
+        background-color: #FEFCFA !important;
+    }
+
+    /* optional hover effect */
+    [data-testid="stDataFrame"] [role="row"]:hover {
+        background-color: #F9F1EC !important;
+    }
+
+
     </style>
     """,
     unsafe_allow_html=True,
@@ -269,15 +311,15 @@ if user_input:
                     table = result["table"].copy()
                     table.index = table.index + 1
                     table.index.name = "Rank"
+                    if "MONTH" in table.columns:
+                        table["MONTH"] = table["MONTH"].map(MONTH_LABELS)
 
-                    st.dataframe(
-                        table,
-                        use_container_width=True,
-                        height=280
-                    )
-
+                    table.columns = [col.replace("_", " ").title() for col in table.columns]
+                    table["Value"] = table["Value"].round(2)
+                    st.dataframe(table,width="stretch")
                 if result["chart_path"]:
-                    st.image(result["chart_path"])
+                    # st.image(result["chart_path"])
+                    streamlit_bokeh(result["chart_path"])#, use_container_width=True)
 
                 st.markdown(clean_llm_markdown(response))
 
@@ -285,7 +327,7 @@ if user_input:
                 st.markdown(clean_llm_markdown(response))
 
                 if result["chart_path"]:
-                    st.image(result["chart_path"])
+                    streamlit_bokeh(result["chart_path"])
 
                 if result["table"] is not None:
                     st.dataframe(
@@ -294,6 +336,9 @@ if user_input:
                         hide_index=True
                     )
 
-        st.session_state.messages.append({"role": "assistant",
-                                            "content": response,
-                                            "result": result})
+        st.session_state.messages.append({
+        "role": "assistant",
+        "content": result["summary"],
+        "metadata": result.get("metadata"),
+        "table": result.get("table"),
+        "chart_path": result.get("chart_path")})

@@ -70,9 +70,10 @@ def rank_periods(df, sort_by, n=10, ascending=False):
     sort_by can be a string or list of strings.
     """
     if n >=1:
-        return df.sort_values(by=sort_by, ascending=ascending).head(abs(n))
+        ranked= df.sort_values(by=sort_by, ascending=ascending).head(abs(n))
     else:
-        return df.sort_values(by=sort_by, ascending=ascending)
+        ranked= df.sort_values(by=sort_by, ascending=ascending)
+    return ranked.reset_index(drop=True)
 
 def filter_df(df, field, value, operator=">="):
     if operator == ">=":

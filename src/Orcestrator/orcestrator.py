@@ -8,8 +8,11 @@ from Tools import analytics_registry
 # sys.path.append("../src/Orcestrator")
 from Orcestrator.agent_response import AgentResponse
 from Orcestrator.agent_validation import AgentValidator
+import Narration.summaries as summaries
 
-def run_agent(question):
+def run_analytics_agent(question,chat_history=None):
+    chat_history = chat_history or []
+
     data_plan = DataPlanBuilder(question).run()
     # AgentValidator.validate_plan(data_plan)
 
@@ -28,3 +31,6 @@ def run_agent(question):
     chart_path = chart.run()
 
     return AgentResponse(question, result, chart_path, data_plan, tool)
+
+def run_general_agent(question,metadata,chat_history=None):
+    return summaries.run_general_assistant(question,metadata,chat_history)

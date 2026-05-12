@@ -1,8 +1,5 @@
-import sys
-sys.path.append("../src/Analysis")
-
-import Comparison,Ranking,Correlation
-from tool_registry import register_tool
+from Analysis import Comparison, Ranking, Correlation
+from Tools.tool_registry import register_tool
 
 @register_tool(
     "ranking",
