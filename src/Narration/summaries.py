@@ -6,6 +6,24 @@ import DataBase.db as db
 PROMPTS_DIR = Path(__file__).resolve().parents[2] / "prompts"
 client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
+def build_clarification_prompt(original_question,analysis_response,follow_up_question):
+    with open(PROMPTS_DIR / "clarification_prompt.txt") as f:
+        template = f.read()
+        prompt = template.format(original_question=original_question,analysis_response=analysis_response,follow_up_question=follow_up_question)
+    return prompt    
+
+def build_followup_prompt(chat_history,current_user_question):
+    with open(PROMPTS_DIR / "followup_prompt.txt") as f:
+        template = f.read()
+        prompt = template.format(chat_history=chat_history,current_user_question=current_user_question)
+    return prompt    
+
+def build_conversation_action_prompt(user_input,chat_history):
+    with open(PROMPTS_DIR / "conversation_action_prompt.txt") as f:
+        template = f.read()
+        prompt = template.format(user_input=user_input,chat_history=chat_history)
+    return prompt
+
 def build_pearson_correlation_analysis_prompt(question,context,corr_df,stats_df):
     with open(PROMPTS_DIR / "pearson_correlation_analysis_prompt.txt") as f:
         template = f.read()
@@ -155,8 +173,8 @@ def build_context(series_ids):
 
     for series in series_ids:
         metadata=db.get_series_metadata(series_id=series)
+        print(f"{metadata['title']}")
         context+=f"""This is the {metadata['title'][0]} dataset. 
-
         About the dataset:
         {metadata['notes'][0]}
         """
@@ -174,8 +192,17 @@ def run_pearson_correlation_analysis(question,context,df,ranked_df):
 def run_spearman_correlation_analysis(question,context,df,ranked_df,spearman_reason):
     return run_prompt(build_spearman_correlation_analysis_prompt(question,context,df,ranked_df,spearman_reason))
 
-def run_question_router(question,recent_history=None,max_tokens=10):
+def run_question_router(question,recent_history,max_tokens=10):
     return run_prompt(build_question_router_prompt(question,recent_history,max_tokens))
 
-def run_general_assistant(question,available_series,recent_history=None,max_tokens=250):
+def run_general_assistant(question,available_series,recent_history,max_tokens=250):
     return run_prompt(build_general_assistant_prompt(question,available_series,recent_history),max_tokens)
+
+def run_conversation_action(user_input,chat_history):
+    return run_prompt(build_conversation_action_prompt(user_input,chat_history))
+
+def run_followup(chat_history,current_user_question):
+    return run_prompt(build_followup_prompt(chat_history,current_user_question))
+
+def run_clarification_prompt(original_question,analysis_response,follow_up_question):
+    return run_prompt(build_clarification_prompt(original_question,analysis_response,follow_up_question))
