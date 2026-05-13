@@ -9,16 +9,48 @@ import date_parser
 import pandas as pd
 pd.set_option('display.max_colwidth', None)
 
-# Load from the saved file
-QUESTION_INTENT_MODEL = joblib.load('../data/log_regression_intent_classifier.joblib')
+import os
+import joblib
+
+BASE_DIR = os.path.dirname(__file__)
+
+MODEL_PATH = os.path.abspath(
+    os.path.join(
+        BASE_DIR,
+        "..",
+        "data",
+        "log_regression_intent_classifier.joblib"
+    )
+)
+
+QUESTION_INTENT_MODEL = joblib.load(MODEL_PATH)
+
+# # Load from the saved file
+# QUESTION_INTENT_MODEL = joblib.load('../data/log_regression_intent_classifier.joblib')
 
 SERIES_ALIASES = {
-    "CPIAUCSL": ["inflation"],
-    "UNRATE": ["jobless"],
-    "FEDFUNDS": ["interest"],
-    "GDP": ["economic output"],
-    "PAYEMS": ["nonfarm payroll"]
+    "CPIAUCSL": ["inflation","cpi","consumer price index","prices"],
+    "UNRATE": ["jobless","unemployment"],
+    "FEDFUNDS": ["interest","federal funds"],
+    "GDP": ["economic output","gdp","gross domestic product"],
+    "PAYEMS": ["jobs","payrolls","nonfarm","household employees", "unpaid volunteers", "farm employees", "self-employed"]
 }
+
+def rule_based_intent_override(question):
+    q = question.lower()
+
+    comparison_terms = ["difference","different","compare", "compared","between", "higher than","lower than","before and after","before","after"]
+    correlation_terms = ["relationship","correlation","correlated","association","move together","related"]
+    ranking_terms = ["top","bottom", "highest", "lowest", "rank","worst", "best"]
+
+    if any(term in q for term in ranking_terms):
+        return "ranking"
+    if any(term in q for term in correlation_terms):
+        return "correlation"
+    if any(term in q for term in comparison_terms):
+        return "comparison"
+
+    return None
 
 def predict_intent(question):
     """
@@ -37,7 +69,11 @@ def predict_intent(question):
 
     returns one of the above categories
     """
-    # Make a prediction
+    override = rule_based_intent_override(question)
+    if override is not None:
+        return override
+    
+    # Make a prediction using ml model
     return QUESTION_INTENT_MODEL.predict([question])[0]
 
 def predict_series_intent(question,metadata):
@@ -49,33 +85,70 @@ def predict_series_intent(question,metadata):
     """
     top_results=[]
 
-    question_lower = question.lower()
+    # question_lower = question.lower()
 
-    for series_id, aliases in SERIES_ALIASES.items():
-        # check series_id itself
-        if series_id.lower() in question_lower:
-            top_results.append(series_id)
-            continue
+    # for series_id, aliases in SERIES_ALIASES.items():
+    #     # check series_id itself
+    #     if series_id.lower() in question_lower:
+    #         top_results.append(series_id)
+    #         continue
 
-        # check aliases
-        for alias in aliases:
-            if alias.lower() in question_lower:
-                top_results.append(series_id)
-                break
+    #     # check aliases
+    #     for alias in aliases:
+    #         if alias.lower() in question_lower:
+    #             top_results.append(series_id)
+    #             break
 
     # now perform fuzzy matching
     metadata["aliases"] = metadata["series_id"].map(lambda x: " ".join(SERIES_ALIASES.get(x, [])))    
-    metadata["search_text"] = (metadata["series_id"] + " " + metadata["title"])#+" "+metadata["aliases"])
+    metadata["search_text"] = (metadata["series_id"] + " " + metadata["title"]+" "+metadata["aliases"])
     choice_map = dict(zip(metadata["search_text"], metadata["series_id"]))
     choices = metadata["search_text"].tolist()
 
-    results = process.extract(question,choices,limit=3)
-  
-    for match, score in results:
-        if score > 70:
-            top_results.append(choice_map[match])
+    results = process.extract(question,choices,limit=5)
+    # for match, score in results:
+    #     if score > 70 and choice_map[match] not in top_results:
+    #         top_results.append(choice_map[match])
 
+    # if len(top_results) ==0:
+    print(results)
+    clarification_results=series_intent_clarification(question,results)
+    print(clarification_results)
+    top_results.extend(clarification_results)
     return top_results
+
+def series_intent_clarification(question,fuzzywuzzy):
+    #     fuzzywuzzy was used to calculate the best possible dataset matches:
+    # {fuzzywuzzy}
+    clarification_prompt = f""" The user asked:{question}
+
+    The system needs clarification on which dataset to use based on the user inquiry and the data semantics:
+
+    Dataset semantic mappings:
+
+    - inflation, cpi, prices, consumer price index -> CPIAUCSL
+    - unemployment, unemployed, jobless, joblessness -> UNRATE
+    - employment, employed, jobs, payrolls, workforce, labor market, workers -> PAYEMS
+    - interest rates, interest, federal funds, fed funds, monetary policy -> FEDFUNDS
+    - gdp, economic output, gross domestic product -> GDP
+
+    Important semantic rules:
+
+    - "employment" is NOT the same as "unemployment"
+    - questions about workers, jobs, or employment levels should use PAYEMS
+    - questions about joblessness or unemployment rates should use UNRATE
+    - use multiple dataset codes if the question compares multiple economic concepts
+
+    Based on the semanitic meanings which dataset should I use to best answer the users question? 
+    
+    Output Rules:
+    - Return ONLY a comma seperated list [CPIAUCSL,UNRATE,FEDFUNDS,GDP,PAYEMS]
+    - No spaces
+    - No explanations
+    - Do not include labels, explanations, bullets, or additional text. 
+    """
+    message = summaries.run_prompt(clarification_prompt)
+    return message.split(',')
 
 def timeline_intent(question,date_grain):
     """
