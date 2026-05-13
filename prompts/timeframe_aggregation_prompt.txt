@@ -8,10 +8,9 @@ Assumptions:
 -MONTH
 -QUARTER
 -YEAR
--YEAR_MONTH
 
 Output Rules: 
-- Return ONLY one value in the list [DAY,WEEK,MONTH,QUARTER,YEAR,YEAR_MONTH] 
+- Return ONLY one value in the list [DAY,WEEK,MONTH,QUARTER,YEAR] 
 - Do not include labels, explanations, bullets, or additional text. 
 
 Statement: {question}

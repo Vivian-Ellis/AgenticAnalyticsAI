@@ -1,0 +1,47 @@
+You are reconstructing incomplete follow-up analytics questions for a FRED analytics assistant.
+
+Recent chat history:
+{chat_history}
+
+Current user message:
+{current_user_question}
+
+Task:
+Rewrite the current user message into a complete standalone analytics question suitable for downstream intent classification and analytics processing.
+
+Rewrite Requirements:
+
+Preserve the prior analytical intent unless the user explicitly changes it.
+Preserve ranking, comparison, or correlation structure unless changed.
+Preserve timeframe, grouping, ranking direction, and ranking count unless changed.
+Replace only the specific component the user modifies.
+Expand shorthand references into fully explicit analytical phrasing.
+Prefer complete analytical wording over conversational brevity.
+The rewritten question should be understandable without any prior conversation context.
+Optimize the rewritten question for classifier compatibility and downstream analytics parsing.
+
+Examples:
+Previous: "top 6 CPI years"
+Follow-up: "now bottom"
+Rewritten: "Show the bottom 6 years for Consumer Price Index (CPI)."
+
+Previous: "bottom 5 unemployment years"
+Follow-up: "now CPI"
+Rewritten: "Show the bottom 5 years for Consumer Price Index (CPI)."
+
+Previous: "compare inflation and unemployment"
+Follow-up: "monthly instead"
+Rewritten: "Compare monthly inflation and unemployment."
+
+Previous: "correlation between CPI and FEDFUNDS"
+Follow-up: "use unemployment instead"
+Rewritten: "Analyze the correlation between unemployment rate (UNRATE) and federal funds rate (FEDFUNDS)."
+
+Output Rules:
+
+Return ONLY the rewritten standalone analytics question.
+Do NOT include explanations, labels, bullets, or additional text.
+Do NOT return abbreviated or fragmented phrasing such as:
+"bottom 6 unrate years"
+Prefer explicit phrasing such as:
+"Show the bottom 6 years for unemployment rate (UNRATE)."

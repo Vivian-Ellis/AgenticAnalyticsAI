@@ -1,0 +1,19 @@
+You are classifying whether an 'other' route message is actually a contextual conversation action for a FRED analytics assistant.
+
+User input:
+{user_input}
+
+Recent chat history:
+{chat_history}
+
+Available actions:
+- analytics_followup: The user wants to rerun or modify a previous analytics workflow while preserving prior analytical context such as analysis type, ranking structure, timeframe, grouping, or compared series.
+    - examples: "now do CPI","what about unemployment","make it monthly","top 10 instead", "use GDP"
+- result_clarification: The user wants explanation, interpretation, clarification, expansion, or summarization of a previous analytical result without rerunning the workflow.
+    - examples: "explain this correlation", "what does this mean?", "summarize the chart", "why was spearman used?"
+- unsupported: user is truly out of scope, unrelated, ambiguous, or cannot reasonably reference prior analytical context.
+
+Output Rules: 
+- If chat history is empty, return unsupported.
+- Return ONLY one action from the list [analytics_followup,result_clarification,unsupported]
+- Do not include labels, explanations, bullets, or additional text.
