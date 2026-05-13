@@ -17,15 +17,19 @@ class DataPlanBuilder:
     def determine_question_intent(self):
         #determine question intent via logreg
         self.question_intent=user_intent.predict_intent(self.question)
+        print(f"{self.question} intent: {self.question_intent}")
 
     def infer_query_parameters(self):
         #determine what dataset to use via fuzzywuzzy
         metadata=db.get_series_metadata()
         series_ids=user_intent.predict_series_intent(self.question,metadata)
+        print(f"series ids: {series_ids}")
         #determine the date aggregation grain
         date_grain=user_intent.date_aggregation_grain_intent(self.question)
+        print(f"date grain: {date_grain}")
         #determine time frame of dataset via claude LLM & validate output
         start_date, end_date=user_intent.timeline_intent(self.question,date_grain)
+        print(f"timeline: {start_date} - {end_date}")
         self.series_ids=series_ids
         self.date_grain=date_grain
         self.start_date=start_date
