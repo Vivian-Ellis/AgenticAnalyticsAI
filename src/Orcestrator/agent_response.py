@@ -9,6 +9,8 @@ class AgentResponse:
             "summary": result.summary_narration,
             "chart_path": chart_path,
             "table": select_display_table(result),
+            "original_table":result.original_df,
+            "methodology_reasoning": select_methodology_reasoning(result),
             "metadata": {
                 "intent": data_plan.question_intent,
                 "series_ids": data_plan.series_ids,
@@ -21,6 +23,16 @@ class AgentResponse:
             }
         }
 
+def select_methodology_reasoning(result):
+    if result.intent == "ranking":
+        return ""
+
+    if result.intent == "comparison":
+        return ""
+
+    if result.intent == "correlation":
+        return result.spearman_reason
+
 def select_display_table(result):
     if result.intent == "ranking":
         return result.ranked_df
@@ -30,4 +42,3 @@ def select_display_table(result):
 
     if result.intent == "correlation":
         return result.corr_df
- 

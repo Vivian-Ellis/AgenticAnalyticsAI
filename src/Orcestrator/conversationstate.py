@@ -37,7 +37,7 @@ def markdown_table(table,analysis_type):
             # display table to chat
             st.dataframe(table,width="stretch")
         else:
-            st.dataframe(table,use_container_width=True,hide_index=True)
+            st.dataframe(table,width='stretch',hide_index=True)
 
 def markdown_chart(chart):
     if chart:
@@ -82,7 +82,7 @@ for msg in st.session_state.messages:
     else:
         with st.chat_message("assistant", avatar=None):
             # st.write(msg["content"])
-            st.markdown(f'<p class="assistant-message">{msg["content"]}{msg["table"]}{msg["chart_path"]}</p>',unsafe_allow_html=True)
+            render_assistant_message(msg)
 
 # handling new user input
 if user_input:
@@ -95,7 +95,9 @@ if user_input:
     # generate assistant response
     with st.chat_message("assistant", avatar=None):
         with st.spinner("Analyzing..."):
-            result=helper.question_routing(user_input,metadata)
+            result=helper.question_routing(user_input=user_input,
+                                           metadata=metadata,
+                                           chat_history=st.session_state.messages)
             assistant_msg = {
                 "role": "assistant",
                 "content": result["summary"],
