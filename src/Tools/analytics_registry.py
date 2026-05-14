@@ -1,7 +1,7 @@
 from Analysis import Comparison, Ranking, Correlation
-from Tools.tool_registry import register_tool
+from Tools.registries.analytics_tool_registry import register_analytics_tool
 
-@register_tool(
+@register_analytics_tool(
     "ranking",
     description="""Performs ranking analysis by interpreting the semantic intent of a ranking question, 
         determining the appropriate ranking direction and number of results, aggregating the dataset, and 
@@ -26,7 +26,7 @@ def ranking_tool(data_loader):
     analysis = Ranking.RankingAnalysis(data_loader)
     return analysis.run_analysis()
 
-@register_tool(
+@register_analytics_tool(
     "correlation",
     description="""Performs correlation analysis by reshaping and aggregating time series data, testing for 
     outliers and normality, and dynamically selecting either Pearson or Spearman correlation based on the 
@@ -52,7 +52,7 @@ def correlation_tool(data_loader):
     analysis = Correlation.CorrelationAnalysis(data_loader)
     return analysis.run_analysis()
 
-@register_tool(
+@register_analytics_tool(
     "comparison",
     description="""Performs statistical comparison analysis by interpreting the semantic intent of a comparison question, 
     selecting the appropriate inferential statistical test (such as Welch’s t-test or one-way ANOVA), computing descriptive 
