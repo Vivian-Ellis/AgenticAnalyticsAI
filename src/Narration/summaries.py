@@ -6,6 +6,12 @@ import DataBase.db as db
 PROMPTS_DIR = Path(__file__).resolve().parents[2] / "prompts"
 client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
+def build_series_intent_prompt(question):
+    with open(PROMPTS_DIR / "planner/series_intent.txt") as f:
+        template = f.read()
+        prompt = template.format(question=question)
+    return prompt    
+
 def build_clarification_prompt(original_question,analysis_response,follow_up_question):
     with open(PROMPTS_DIR / "clarification_prompt.txt") as f:
         template = f.read()
@@ -206,3 +212,9 @@ def run_followup(chat_history,current_user_question):
 
 def run_clarification_prompt(original_question,analysis_response,follow_up_question):
     return run_prompt(build_clarification_prompt(original_question,analysis_response,follow_up_question))
+
+def run_series_intent_prompt(question):
+    return run_prompt(build_series_intent_prompt(question))
+
+def comparison_method_intent(question,date_grain,num_groups,routing_priority,stat_test_plan):
+    return run_prompt(build_comparison_method_prompt(question,date_grain,num_groups,routing_priority,stat_test_plan))
