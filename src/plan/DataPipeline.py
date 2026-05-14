@@ -125,7 +125,10 @@ class ClaudeDataPlanBuilder:
             if block.type == "tool_use":
                 tool = get_planner_tool(block.name)
                 result = tool["function"](**block.input)
-        
+
+        if result is None:
+            raise ValueError("Claude did not call a planner tool.")
+    
         self.question_intent = result["question_intent"]
         self.series_ids = result["series_ids"]
         self.date_grain = result["date_grain"]
