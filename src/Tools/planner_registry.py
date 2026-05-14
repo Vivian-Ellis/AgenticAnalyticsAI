@@ -2,10 +2,10 @@ import joblib
 import sys
 sys.path.append("../src")
 import DataBase.db as db
-from fuzzywuzzy import process
+# from fuzzywuzzy import process
 import Narration.summaries as summaries
 import date_parser
-
+from Tools.registries.planner_tool_registry import register_planner_tool
 import pandas as pd
 pd.set_option('display.max_colwidth', None)
 
@@ -18,15 +18,13 @@ MODEL_PATH = os.path.abspath(
     os.path.join(
         BASE_DIR,
         "..",
+        "..",
         "data",
         "log_regression_intent_classifier.joblib"
     )
 )
 
 QUESTION_INTENT_MODEL = joblib.load(MODEL_PATH)
-
-# # Load from the saved file
-# QUESTION_INTENT_MODEL = joblib.load('../data/log_regression_intent_classifier.joblib')
 
 SERIES_ALIASES = {
     "CPIAUCSL": ["inflation","cpi","consumer price index","prices"],
@@ -52,104 +50,87 @@ def rule_based_intent_override(question):
 
     return None
 
-def predict_intent(question):
+@register_planner_tool(
+    "predict_analytical_intent",
+    description="Selects the best analytical intent for the user question.",
+    input_schema={
+        "type": "object",
+        "properties": {
+            "question": {
+                "type": "string",
+                "description": "The user's most recent analytical question."
+            }
+        },
+        "required": ["question"]
+    },
+    output_type="str"
+)
+def predict_analytical_intent(question):
     """
     this function will predict the analytical intent of the question. 
     the following categories are options: 
-    QUESTION_CATEGORIES = [
-    "trend",
-    "comparison",
-    "ranking",
-    "volatility",
-    "correlation",
-    "unsupported"
-    ]
+    QUESTION_CATEGORIES = ["trend",
+                            "comparison",
+                            "ranking",
+                            "volatility",
+                            "correlation",
+                            "unsupported"]
 
-    this function uses a pretrained logistic regression model from data\log_regression_intent_classifier.joblib with the latest accuracy of 93%
-
-    returns one of the above categories
+    this function uses a pretrained logistic regression model from data\log_regression_intent_classifier.joblib 
+    with the latest accuracy of 93% returns one of the above categories
     """
     override = rule_based_intent_override(question)
     if override is not None:
         return override
-    
     # Make a prediction using ml model
     return QUESTION_INTENT_MODEL.predict([question])[0]
 
-def predict_series_intent(question,metadata):
+@register_planner_tool(
+    "predict_series_intent",
+    description="Selects the best FRED series IDs for the user question.",
+    input_schema={
+        "type": "object",
+        "properties": {
+            "question": {
+                "type": "string",
+                "description": "The user's most recent analytical question."
+            }
+        },
+        "required": ["question"]
+    },
+    output_type="list[str]"
+)
+def predict_series_intent(question):
     """
-    this function uses fuzzywuzzy to determine which dataset to perform and analysis on.
+    this function uses LLM to determine which dataset to perform and analysis on.
 
-    this function will return at most 3 of the highest matching datasets to use. 
+    this function will return the highest matching datasets to use. 
     returns only the list of series_id of the datasets
     """
     top_results=[]
-
-    # question_lower = question.lower()
-
-    # for series_id, aliases in SERIES_ALIASES.items():
-    #     # check series_id itself
-    #     if series_id.lower() in question_lower:
-    #         top_results.append(series_id)
-    #         continue
-
-    #     # check aliases
-    #     for alias in aliases:
-    #         if alias.lower() in question_lower:
-    #             top_results.append(series_id)
-    #             break
-
-    # now perform fuzzy matching
+    metadata = db.get_series_metadata()
     metadata["aliases"] = metadata["series_id"].map(lambda x: " ".join(SERIES_ALIASES.get(x, [])))    
     metadata["search_text"] = (metadata["series_id"] + " " + metadata["title"]+" "+metadata["aliases"])
-    choice_map = dict(zip(metadata["search_text"], metadata["series_id"]))
-    choices = metadata["search_text"].tolist()
-
-    results = process.extract(question,choices,limit=5)
-    # for match, score in results:
-    #     if score > 70 and choice_map[match] not in top_results:
-    #         top_results.append(choice_map[match])
-
-    # if len(top_results) ==0:
-    print(results)
-    clarification_results=series_intent_clarification(question,results)
-    print(clarification_results)
-    top_results.extend(clarification_results)
+    inferred_series_intent = summaries.run_series_intent_prompt(question)
+    top_results.extend(inferred_series_intent.split(','))
     return top_results
 
-def series_intent_clarification(question,fuzzywuzzy):
-    #     fuzzywuzzy was used to calculate the best possible dataset matches:
-    # {fuzzywuzzy}
-    clarification_prompt = f""" The user asked:{question}
 
-    The system needs clarification on which dataset to use based on the user inquiry and the data semantics:
-
-    Dataset semantic mappings:
-
-    - inflation, cpi, prices, consumer price index -> CPIAUCSL
-    - unemployment, unemployed, jobless, joblessness -> UNRATE
-    - employment, employed, jobs, payrolls, workforce, labor market, workers -> PAYEMS
-    - interest rates, interest, federal funds, fed funds, monetary policy -> FEDFUNDS
-    - gdp, economic output, gross domestic product -> GDP
-
-    Important semantic rules:
-
-    - "employment" is NOT the same as "unemployment"
-    - questions about workers, jobs, or employment levels should use PAYEMS
-    - questions about joblessness or unemployment rates should use UNRATE
-    - use multiple dataset codes if the question compares multiple economic concepts
-
-    Based on the semanitic meanings which dataset should I use to best answer the users question? 
-    
-    Output Rules:
-    - Return ONLY a comma seperated list [CPIAUCSL,UNRATE,FEDFUNDS,GDP,PAYEMS]
-    - No spaces
-    - No explanations
-    - Do not include labels, explanations, bullets, or additional text. 
-    """
-    message = summaries.run_prompt(clarification_prompt)
-    return message.split(',')
-
+@register_planner_tool(
+    "timeline_intent",
+    description="Selects the best date range for the user question.",
+    input_schema={
+        "type": "object",
+        "properties": {
+            "question": {
+                "type": "string",
+                "description": "The user's most recent analytical question."
+            }
+        },
+        "required": ["question","date_grain"]
+    },
+    output_type="str"
+)
 def timeline_intent(question,date_grain):
     """
     this function uses claude LLM to determine a date range for the user question
@@ -181,6 +162,21 @@ def timeline_intent_failed(question,date_range):
     prompt=summaries.timeframe_validation_failed_prompt(question,date_range)
     return summaries.run_prompt(prompt)
 
+@register_planner_tool(
+    "date_aggregation_grain_intent",
+    description="Selects the best date grain (aggresgation on the date field) for the users question. Is one of the following: 'DAY','WEEK','MONTH','QUARTER','YEAR','YEAR_MONTH'",
+    input_schema={
+        "type": "object",
+        "properties": {
+            "question": {
+                "type": "string",
+                "description": "The user's most recent analytical question."
+            }
+        },
+        "required": ["question","date_grain"]
+    },
+    output_type="str"
+)
 def date_aggregation_grain_intent(question):
     date_grain=summaries.run_prompt(summaries.build_timeframe_aggregation_prompt(question))
     #quick validation
@@ -188,7 +184,3 @@ def date_aggregation_grain_intent(question):
         return date_grain
     else:
         return 'YEAR'
-    
-def comparison_method_intent(question,date_grain,num_groups,routing_priority,stat_test_plan):
-    prompt=summaries.build_comparison_method_prompt(question,date_grain,num_groups,routing_priority,stat_test_plan)
-    return summaries.run_prompt(prompt)
