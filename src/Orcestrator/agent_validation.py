@@ -1,6 +1,6 @@
 import sys
 sys.path.append("../src")
-from Tools import tool_registry
+from Tools.registries import analytics_tool_registry
 import pandas as pd
 
 class AgentValidator:
@@ -92,7 +92,7 @@ class AgentValidator:
                 f"Tool name {tool['name']} does not match question intent "
                 f"{data_loader.data_plan.question_intent}.")
 
-        chart_tool = tool_registry.get_chart_tool(tool["default_chart"])
+        chart_tool = analytics_tool_registry.get_chart_tool(tool["default_chart"])
         if chart_tool is NotImplementedError:
             raise ValueError(
                 f"No registered chart found for default_chart: {tool['default_chart']}")

@@ -1,10 +1,14 @@
-import sys
 from pathlib import Path
 from dotenv import load_dotenv
-# import orcestrator
+import sys
+sys.path.append("../src/")
 import os
 import joblib
 import json
+
+from Tools.registries.conversation_tool_registry import list_anthropic_conversation_tools,get_conversation_tool
+from Tools import conversation_registry #need to import this because it populates the resigstry with all the tools in the script
+from Narration import summaries
 
 BASE_DIR = os.path.dirname(__file__)
 MODEL_PATH = os.path.abspath(
@@ -23,7 +27,7 @@ load_dotenv(env_path, override=True)
 
 ROUTING_MODEL = joblib.load(MODEL_PATH)
 
-with open("data/date_labels.json", "r") as f:
+with open("../data/date_labels.json", "r") as f:
     DATE_LABELS = json.load(f)
 
 def date_cleanup(table):
@@ -33,6 +37,24 @@ def date_cleanup(table):
                 table[grain]
                 .astype(str)
                 .map(DATE_LABELS[grain]))
+
+def markdown_table_helper(table,analysis_type):
+    #for rank
+    if table is not None:
+        if analysis_type=="ranking":
+            table = table.copy()
+            table.index = table.index + 1
+            table.index.name = "Rank"
+            # human readable dates
+            date_cleanup(table)
+            # format header
+            table.columns = [col.replace("_", " ").title() for col in table.columns]
+            #round values
+            table["Value"] = table["Value"].round(2)
+            # display table to chat
+            return table
+        else:
+            return table
 
 def clean_llm_markdown(text: str) -> str:
     if text is None:
@@ -49,39 +71,44 @@ def clean_llm_markdown(text: str) -> str:
     text = text.replace("•", "-")
     return text
 
-from Tools import conversation_tool_registry
-from Tools import conversation_registry
+#question route is NOT the analytical intent , this instead is the conversation route: 
+# analytics-user wants to perform some analytical task
+# greeting-user is just saying hi
+# other -this type of user input is not currently supported
+def question_routing(user_input,chat_history=None):
+    conversation_tools=list_anthropic_conversation_tools()
+    print(conversation_tools)
+    message = f"""You are a routing layer. You must call exactly one conversation tool.
 
-def question_routing(user_input,metadata,chat_history=None):
-    route = ROUTING_MODEL.predict([user_input])[0]
-    tool=conversation_tool_registry.get_conversation_tool(route)
-    return tool["function"](user_input,metadata,chat_history)
+    Do not answer the user directly.
+    Do not ask clarifying questions.
+    If the message is asking for any FRED data analysis, call analytics.
 
-#     if route == "analytics":
-#         agentresponse = orcestrator.run_analytics_agent(user_input)
-#         return {
-#             "summary": clean_llm_markdown(agentresponse.response['summary']),
-#             "chart_path": agentresponse.response['chart_path'],
-#             "table": agentresponse.response['table'],
-#             "metadata": {"route": "analytics",
-#                          "intent":agentresponse.response["metadata"]["intent"]}
-#         }
+    Examples:
+    - "bottom 7 unrate months in 2019" -> analytics
+    - "top 5 CPI years" -> analytics
+    - "now for CPI" -> analytics
+    - "what datasets can I use?" -> metadata_inquiry
+    - "hi" -> greeting
 
-#     elif route == "greeting":
-#         return {
-#             "summary": "Hi, I'm ready to answer questions about FRED data.",
-#             "chart_path": None,
-#             "table": None,
-#             "metadata": {"route": "greeting",
-#                          "intent":None}
-#         }
+    Recent chat history:
+    {chat_history}
 
-#     elif route in ["metadata", "other"]:
-#         response = orcestrator.run_general_agent(user_input, metadata, chat_history)
-#         return {
-#             "summary": clean_llm_markdown(response),
-#             "chart_path": None,
-#             "table": None,
-#             "metadata": {"route": route,
-#                          "intent":None}
-#         }
+    User message:
+    {user_input}"""
+    
+    # Claude chooses to call the tool
+    message_content=summaries.run_tool_prompt(conversation_tools,message)
+    print(message_content)
+    result = None
+    # Python executes the tool
+    for block in message_content:
+        if block.type == "tool_use":
+            tool = get_conversation_tool(block.name)
+            result = tool["function"](**block.input)
+            break
+
+    if result is None:
+        raise ValueError("Claude did not call a conversation tool.")
+
+    return result

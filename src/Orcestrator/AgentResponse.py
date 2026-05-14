@@ -12,7 +12,7 @@ class AgentResponse:
             "original_table":result.original_df,
             "methodology_reasoning": select_methodology_reasoning(result),
             "data_plan": {
-                "question_analytical_intent": data_plan.question_intent,
+                "intent": data_plan.question_intent,
                 "series_ids": data_plan.series_ids,
                 "date_grain": data_plan.date_grain,
                 "start_date": data_plan.start_date,
@@ -24,17 +24,17 @@ class AgentResponse:
         }
 
 def select_methodology_reasoning(result):
-    if result.question_analytical_intent == "ranking":
+    if result.intent == "ranking":
         return ""
-    if result.question_analytical_intent == "comparison":
+    if result.intent == "comparison":
         return ""
-    if result.question_analytical_intent == "correlation":
+    if result.intent == "correlation":
         return result.spearman_reason
 
 def select_display_table(result):
-    if result.question_analytical_intent == "ranking":
+    if result.intent == "ranking":
         return result.ranked_df
-    if result.question_analytical_intent == "comparison":
+    if result.intent == "comparison":
         return result.descriptive_statistics
-    if result.question_analytical_intent == "correlation":
+    if result.intent == "correlation":
         return result.corr_df

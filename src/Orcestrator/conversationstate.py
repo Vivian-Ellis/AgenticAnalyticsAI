@@ -13,28 +13,20 @@ import conversationstatehelper as helper
 import streamlit as st
 from streamlit_bokeh import streamlit_bokeh
 
+#pull the FRED metadata for available datasets
 @st.cache_data(show_spinner=False)
 def load_metadata():
     return db.get_series_metadata()
 
-metadata = load_metadata()[["series_id","title","frequency","observation_start","observation_end"]].to_markdown(index=False)
+fred_metadata = load_metadata()[["series_id","title","frequency","observation_start","observation_end"]].to_markdown(index=False)
 
 markdown_style = Path("appmarkdownstyle.txt").read_text()
 
 def markdown_table(table,analysis_type):
     #for rank
     if table is not None:
+        table=helper.markdown_table_helper(table,analysis_type)
         if analysis_type=="ranking":
-            table = table.copy()
-            table.index = table.index + 1
-            table.index.name = "Rank"
-            # human readable dates
-            helper.date_cleanup(table)
-            # format header
-            table.columns = [col.replace("_", " ").title() for col in table.columns]
-            #round values
-            table["Value"] = table["Value"].round(2)
-            # display table to chat
             st.dataframe(table,width="stretch")
         else:
             st.dataframe(table,width='stretch',hide_index=True)
@@ -47,18 +39,18 @@ def render_assistant_message(msg):
     content = msg.get("content")
     table = msg.get("table")
     chart = msg.get("chart_path")
-    intent = msg.get("metadata", {}).get("intent")
-
-    if intent == "ranking":
+    question_analytical_intent = msg.get("data_plan", {}).get("question_analytical_intent")
+    
+    if question_analytical_intent == "ranking":
         # prints all three respectively: ranked table, chart, and short summary
-        markdown_table(table, intent)
+        markdown_table(table, question_analytical_intent)
         markdown_chart(chart)
         st.markdown(content)
     else:
         # prints all three respectively: full summary, chart, and table
         st.markdown(content)
         markdown_chart(chart)
-        markdown_table(table, intent)
+        markdown_table(table, question_analytical_intent)
 
 # initialize memory
 if "messages" not in st.session_state:
@@ -96,16 +88,16 @@ if user_input:
     with st.chat_message("assistant", avatar=None):
         with st.spinner("Analyzing..."):
             result=helper.question_routing(user_input=user_input,
-                                           metadata=metadata,
+                                           fred_metadata=fred_metadata,
                                            chat_history=st.session_state.messages)
             assistant_msg = {
                 "role": "assistant",
                 "content": result["summary"],
-                "metadata": result.get("metadata", {}),
+                "data_plan": result.get("data_plan", {}),
                 "table": result.get("table"),
                 "chart_path": result.get("chart_path")}
 
             render_assistant_message(assistant_msg)
-
+            print(assistant_msg)
         # append to chat history
         st.session_state.messages.append(assistant_msg)
