@@ -31,3 +31,17 @@ def list_conversation_tools():
     Return all registered tools for the conversation state.
     """
     return CONVERSATION_REGISTRY
+
+def list_anthropic_conversation_tools():
+    """
+    Return all registered tools for the converstation state in a format that can be used by anthropics API tool call.
+    """
+    anthropic_tools = []
+    for tool in CONVERSATION_REGISTRY.values():
+        anthropic_tools.append({
+            "name": tool["name"],
+            "description": tool["description"],
+            "input_schema": tool["input_schema"]
+        })
+
+    return anthropic_tools
