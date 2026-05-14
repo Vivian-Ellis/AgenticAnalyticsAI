@@ -2,49 +2,47 @@ import sys
 sys.path.append("../src/")
 import DataBase.db as db
 import Narration.summaries as summaries
-import user_intent
+import Tools.planner_registry as planner_registry
 
-class DataPlanBuilder:
-    def __init__(self,question):
-        self.question=question
-        self.question_intent=None
-        self.series_ids=None
-        self.date_grain=None
-        self.start_date=None
-        self.end_date=None
-        self.dataset_context=None
+# class DataPlanBuilder:
+#     def __init__(self,question):
+#         self.question=question
+#         self.question_intent=None
+#         self.series_ids=None
+#         self.date_grain=None
+#         self.start_date=None
+#         self.end_date=None
+#         self.dataset_context=None
 
-    def determine_question_intent(self):
-        #determine question intent via logreg
-        self.question_intent=user_intent.predict_intent(self.question)
-        print(f"{self.question} intent: {self.question_intent}")
+#     def determine_question_intent(self):
+#         #determine question intent via logreg
+#         self.question_intent=planner_registry.predict_analytical_intent(self.question)
+#         print(f"{self.question} intent: {self.question_intent}")
 
-    def infer_query_parameters(self):
-        #determine what dataset to use via fuzzywuzzy
-        metadata=db.get_series_metadata()
-        series_ids=user_intent.predict_series_intent(self.question,metadata)
-        print(f"series ids: {series_ids}")
-        #determine the date aggregation grain
-        date_grain=user_intent.date_aggregation_grain_intent(self.question)
-        print(f"date grain: {date_grain}")
-        #determine time frame of dataset via claude LLM & validate output
-        start_date, end_date=user_intent.timeline_intent(self.question,date_grain)
-        print(f"timeline: {start_date} - {end_date}")
-        self.series_ids=series_ids
-        self.date_grain=date_grain
-        self.start_date=start_date
-        self.end_date=end_date
+#     def infer_query_parameters(self):
+#         series_ids=planner_registry.predict_series_intent(self.question)
+#         print(f"series ids: {series_ids}")
+#         #determine the date aggregation grain
+#         date_grain=planner_registry.date_aggregation_grain_intent(self.question)
+#         print(f"date grain: {date_grain}")
+#         #determine time frame of dataset via claude LLM & validate output
+#         start_date, end_date=planner_registry.timeline_intent(self.question,date_grain)
+#         print(f"timeline: {start_date} - {end_date}")
+#         self.series_ids=series_ids
+#         self.date_grain=date_grain
+#         self.start_date=start_date
+#         self.end_date=end_date
         
-    def infer_data_context(self):
-        #pull the series metadata
-        self.dataset_context=summaries.build_context(self.series_ids)
+#     def infer_data_context(self):
+#         #pull the series metadata
+#         self.dataset_context=summaries.build_context(self.series_ids)
         
-    def run(self):
-        self.determine_question_intent()
-        self.infer_query_parameters()
-        self.infer_data_context()
+#     def run(self):
+#         self.determine_question_intent()
+#         self.infer_query_parameters()
+#         self.infer_data_context()
         
-        return self
+#         return self
     
 class DataLoader:
     def __init__(self,data_plan):
@@ -63,3 +61,79 @@ class DataLoader:
         
     def run(self):
         return self.load_data()
+
+
+
+
+from pathlib import Path
+import os
+import anthropic
+
+import joblib
+import sys
+sys.path.append("../src")
+
+client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+
+from Tools.registries.planner_tool_registry import list_anthropic_planner_tools,get_planner_tool
+from Tools import planner_registry 
+import Narration.summaries
+
+class ClaudeDataPlanBuilder:
+    def __init__(self,question):
+        self.question=question
+        self.planner_tools=list_anthropic_planner_tools()
+        self.question_intent=None
+        self.series_ids=None
+        self.date_grain=None
+        self.start_date=None
+        self.end_date=None
+        self.dataset_context=None
+
+    # #this is only for the analytical intent
+    # def build_data_plan(self):
+    #     message=f"""I want to determine the analytical intent of the user's question. Choose the correct 
+    #                 planner tool to call from the available tools. Build the tool call with the required arguments.
+    #                 User question:
+    #                 {self.question}
+    #                 """
+    #     message_content=summaries.run_tool_prompt(self.planner_tools,message)
+
+    #     for block in message_content:
+    #         if block.type == "tool_use":
+    #             get_planner_tool(block.name)["function"](**block.input)
+
+    def build_entire_data_plan(self):
+        message=f"""Build the complete DataPlan for this analytics question.
+
+                    The DataPlan must include:
+                    - question_intent
+                    - series_ids
+                    - date_grain
+                    - start_date
+                    - end_date
+
+                    Choose the best planner tool to build this plan.
+
+                    User question:
+                    {self.question}"""
+        
+        # Claude chooses to call the tool
+        message_content=summaries.run_tool_prompt(self.planner_tools,message)
+        # Python executes the tool
+        for block in message_content:
+            if block.type == "tool_use":
+                tool = get_planner_tool(block.name)
+                result = tool["function"](**block.input)
+        
+        self.question_intent = result["question_intent"]
+        self.series_ids = result["series_ids"]
+        self.date_grain = result["date_grain"]
+        self.start_date = result["start_date"]
+        self.end_date = result["end_date"]
+        self.dataset_context = result["dataset_context"]
+
+        return self
+
+    def run(self):
+        return self.build_entire_data_plan()

@@ -184,3 +184,34 @@ def date_aggregation_grain_intent(question):
         return date_grain
     else:
         return 'YEAR'
+    
+@register_planner_tool(
+    "build_entire_data_plan",
+    description="Builds the complete DataPlan for an analytical FRED question.",
+    input_schema={
+        "type": "object",
+        "properties": {
+            "question": {
+                "type": "string",
+                "description": "The user's analytical question."
+            }
+        },
+        "required": ["question"]
+    },
+    output_type="dict"
+)
+def build_entire_data_plan(question):
+    question_intent = predict_analytical_intent(question)
+    series_ids = predict_series_intent(question)
+    date_grain = date_aggregation_grain_intent(question)
+    start_date, end_date = timeline_intent(question, date_grain)
+    dataset_context=summaries.build_context(series_ids)
+
+    return {
+        "question_intent": question_intent,
+        "series_ids": series_ids,
+        "date_grain": date_grain,
+        "start_date": start_date,
+        "end_date": end_date,
+        "dataset_context":dataset_context
+    }

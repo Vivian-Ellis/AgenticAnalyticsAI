@@ -31,3 +31,17 @@ def list_planner_tools():
     Return all registered tools for the planner state.
     """
     return PLANNER_REGISTRY
+
+def list_anthropic_planner_tools():
+    """
+    Return all registered tools for the planner state in a format that can be used by anthropics API tool call.
+    """
+    anthropic_tools = []
+    for tool in PLANNER_REGISTRY.values():
+        anthropic_tools.append({
+            "name": tool["name"],
+            "description": tool["description"],
+            "input_schema": tool["input_schema"]
+        })
+
+    return anthropic_tools
