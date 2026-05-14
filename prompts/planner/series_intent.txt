@@ -1,0 +1,26 @@
+The user asked:{question}
+
+The system needs clarification on which dataset to use based on the user inquiry and the data semantics:
+
+Dataset semantic mappings:
+
+- inflation, cpi, prices, consumer price index -> CPIAUCSL
+- unemployment, unemployed, jobless, joblessness -> UNRATE
+- employment, employed, jobs, payrolls, workforce, labor market, workers -> PAYEMS
+- interest rates, interest, federal funds, fed funds, monetary policy -> FEDFUNDS
+- gdp, economic output, gross domestic product -> GDP
+
+Important semantic rules:
+
+- "employment" is NOT the same as "unemployment"
+- questions about workers, jobs, or employment levels should use PAYEMS
+- questions about joblessness or unemployment rates should use UNRATE
+- use multiple dataset codes if the question compares multiple economic concepts
+
+Based on the semanitic meanings which dataset should I use to best answer the users question? 
+
+Output Rules:
+- Return ONLY a comma seperated list [CPIAUCSL,UNRATE,FEDFUNDS,GDP,PAYEMS]
+- No spaces
+- No explanations
+- Do not include labels, explanations, bullets, or additional text. 
