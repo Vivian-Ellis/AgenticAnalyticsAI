@@ -1,5 +1,5 @@
-from Tools.conversation_tool_registry import register_conversation
-import orcestrator
+from Tools.registries.conversation_tool_registry import register_conversation
+from Orcestrator import orcestrator
 from pathlib import Path
 from dotenv import load_dotenv
 import sys
