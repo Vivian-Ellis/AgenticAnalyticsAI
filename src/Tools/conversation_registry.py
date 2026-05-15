@@ -12,7 +12,7 @@ env_path = PROJECT_ROOT / ".env"
 load_dotenv(env_path, override=True)
 
 from Orcestrator.conversationstatehelper import clean_llm_markdown
-from Narration.summaries import run_conversation_action,run_followup
+from Narration.summaries import run_conversation_action,run_followup,run_clarification_prompt
 
 @register_conversation(
     "analytics",
@@ -96,19 +96,15 @@ def metadata_inquiry_route(user_input, fred_metadata, chat_history=None):
     }
 
 @register_conversation(
-    "other",
-    description="""Use this for unsupported, unrelated, ambiguous, or general app questions that are not clearly
-    FRED analytics, FRED metadata, or a greeting. This can also inspect follow-up behavior using chat history.""",
+    "analytics_followup",
+    description="""The user wants to rerun or modify a previous analytics workflow while preserving prior analytical context such as analysis type, ranking structure, timeframe, grouping, or compared series.
+    for examples now do CPI,what about unemployment,make it monthly,top 10 instead, use GDP""",
     input_schema={
         "type": "object",
         "properties": {
             "user_input": {
                 "type": "string",
                 "description": "The user's most recent message."
-            },
-            "fred_metadata": {
-                "type": "string",
-                "description": "Markdown table containing available FRED dataset metadata."
             },
             "chat_history": {
                 "type": "array",
@@ -118,39 +114,69 @@ def metadata_inquiry_route(user_input, fred_metadata, chat_history=None):
                 }
             }
         },
-        "required": ["user_input", "fred_metadata", "chat_history"]
+        "required": ["user_input"]
     }
 )
-def other_route(user_input, fred_metadata, chat_history):
-    action=run_conversation_action(user_input,chat_history)
+def analytics_followup_route(user_input, chat_history=None):
+    expanded_user_input=run_followup(chat_history,user_input)
+    return analytic_route(expanded_user_input) #TO-DO make sure to save the enriched user input not the raw input
 
-    if action not in ['analytics_followup','result_clarification','unsupported']:
-        action='unsupported'
-
-    if action =='unsupported':
+@register_conversation(
+    "result_clarification",
+    description="""The user wants explanation, interpretation, clarification, expansion, or summarization of a previous analytical result without rerunning the workflow.
+    - examples: explain this correlation, what does this mean?, summarize the chart, why was spearman used?""",
+    input_schema={
+        "type": "object",
+        "properties": {
+            "user_input": {
+                "type": "string",
+                "description": "The user's most recent message."
+            },
+            "chat_history": {
+                "type": "array",
+                "description": "Recent chat history as a list of message dictionaries.",
+                "items": {
+                    "type": "object"
+                }
+            },
+            "analysis_response": {
+                "type": "string",
+                "description": "recent analytical summary from claude."
+            }
+        },
+        "required": ["user_input","chat_history","analysis_response"]
+    }
+)
+def result_clarification_route(user_input, chat_history, analysis_response):
+        message=run_clarification_prompt(chat_history=chat_history,
+                                 analysis_response=analysis_response, #TO-DO send state instead
+                                 clarification_question=user_input)
         return {
-            "summary": "Your inquiry is not supported at this time.",
+            "summary": clean_llm_markdown(message),
             "chart_path": None,
             "table": None,
-            "data_plan": {"route": "other",
-                            "intent":None}}
-    
-    if action =='analytics_followup':
-        expanded_user_input=run_followup(chat_history,user_input)
-        # response = orcestrator.run_general_agent(user_input, metadata, chat_history)
-        return analytic_route(expanded_user_input)
-    
-    if action =='result_clarification':
-        # expanded_user_input=run_followup(chat_history,user_input)
-        # # response = orcestrator.run_general_agent(user_input, metadata, chat_history)
-        # response=analytic_route(expanded_user_input,metadata,chat_history)
-        print(chat_history)
-        print("--------------------------")
-        print(len(chat_history))
-        return {
-            "summary": "Thinking...",
-            "chart_path": None,
-            "table": None,
-            "data_plan": {"route": "other",
+            "data_plan": {"route": "result_clarification",
                             "intent":None}
         }
+
+@register_conversation(
+    "unsupported",
+    description="""user is truly out of scope, unrelated, ambiguous, or cannot reasonably reference prior analytical context.""",
+    input_schema={
+        "type": "object",
+        "properties": {
+            "user_input": {
+                "type": "string",
+                "description": "The user's most recent message."
+            }
+        },
+        "required": ["user_input"]
+    }
+)
+def unsupported_route(user_input):
+    return {
+        "summary": "Your inquiry is not supported at this time.",
+        "chart_path": None,
+        "table": None,
+        "data_plan": {"route": "unsupported",
+                        "intent":None}}
