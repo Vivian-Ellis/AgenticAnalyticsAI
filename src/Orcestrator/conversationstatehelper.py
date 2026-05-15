@@ -2,33 +2,22 @@ from pathlib import Path
 from dotenv import load_dotenv
 import sys
 sys.path.append("../src/")
-import os
-import joblib
 import json
 
 from Tools.registries.conversation_tool_registry import list_anthropic_conversation_tools,get_conversation_tool
 from Tools import conversation_registry #need to import this because it populates the resigstry with all the tools in the script
 from Narration import summaries
 
-BASE_DIR = os.path.dirname(__file__)
-MODEL_PATH = os.path.abspath(
-    os.path.join(BASE_DIR,
-        "..",
-        "..",
-        "data",
-        "log_regression_route_classifier.joblib"))
-
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+with open(PROJECT_ROOT / "data" / "date_labels.json", "r") as f:
+    DATE_LABELS = json.load(f)
+
 SRC_DIR = PROJECT_ROOT / "src"
 sys.path.append(str(SRC_DIR))
 
 env_path = PROJECT_ROOT / ".env"
 load_dotenv(env_path, override=True)
-
-ROUTING_MODEL = joblib.load(MODEL_PATH)
-
-with open("../data/date_labels.json", "r") as f:
-    DATE_LABELS = json.load(f)
 
 def date_cleanup(table):
     for grain in ["WEEK", "MONTH", "QUARTER"]:

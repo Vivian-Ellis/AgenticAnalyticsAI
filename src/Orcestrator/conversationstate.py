@@ -39,18 +39,18 @@ def render_assistant_message(msg):
     content = msg.get("content")
     table = msg.get("table")
     chart = msg.get("chart_path")
-    question_analytical_intent = msg.get("data_plan", {}).get("question_analytical_intent")
+    intent = msg.get("data_plan", {}).get("intent")
     
-    if question_analytical_intent == "ranking":
+    if intent == "ranking":
         # prints all three respectively: ranked table, chart, and short summary
-        markdown_table(table, question_analytical_intent)
+        markdown_table(table, intent)
         markdown_chart(chart)
         st.markdown(content)
     else:
         # prints all three respectively: full summary, chart, and table
         st.markdown(content)
         markdown_chart(chart)
-        markdown_table(table, question_analytical_intent)
+        markdown_table(table, intent)
 
 # initialize memory
 if "messages" not in st.session_state:
@@ -87,9 +87,7 @@ if user_input:
     # generate assistant response
     with st.chat_message("assistant", avatar=None):
         with st.spinner("Analyzing..."):
-            result=helper.question_routing(user_input=user_input,
-                                           fred_metadata=fred_metadata,
-                                           chat_history=st.session_state.messages)
+            result=helper.question_routing(user_input=user_input,chat_history=st.session_state.messages)
             assistant_msg = {
                 "role": "assistant",
                 "content": result["summary"],
