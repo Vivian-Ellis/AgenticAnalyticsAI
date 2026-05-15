@@ -17,17 +17,17 @@ def run_analytics_agent(question,chat_history=None):
     chat_history = chat_history or []
 
     data_plan=ClaudeDataPlanBuilder(question).run()
-    # AgentValidator.validate_plan(data_plan)
+    AgentValidator.validate_plan(data_plan)
 
     data_loader = DataLoader(data_plan)
     df=data_loader.run()
-    # AgentValidator.validate_data(data_loader)
+    AgentValidator.validate_data(data_loader)
 
     tool = analytics_tool_registry.get_tool(data_loader.data_plan.question_intent)
-    # AgentValidator.validate_tool(tool, data_loader)
+    AgentValidator.validate_tool(tool, data_loader)
 
     result = tool["function"](data_loader)
-    # AgentValidator.validate_result(result)
+    AgentValidator.validate_result(result)
 
     chart_type = tool["default_chart"]
     chart = charts_registry.Chart(result, chart_type)
