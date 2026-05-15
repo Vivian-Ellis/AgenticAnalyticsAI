@@ -12,10 +12,10 @@ def build_series_intent_prompt(question):
         prompt = template.format(question=question)
     return prompt    
 
-def build_clarification_prompt(original_question,analysis_response,follow_up_question):
+def build_clarification_prompt(chat_history,analysis_response,clarification_question):
     with open(PROMPTS_DIR / "clarification_prompt.txt") as f:
         template = f.read()
-        prompt = template.format(original_question=original_question,analysis_response=analysis_response,follow_up_question=follow_up_question)
+        prompt = template.format(chat_history=chat_history,analysis_response=analysis_response,clarification_question=clarification_question)
     return prompt    
 
 def build_followup_prompt(chat_history,current_user_question):
@@ -214,8 +214,8 @@ def run_conversation_action(user_input,chat_history):
 def run_followup(chat_history,current_user_question):
     return run_prompt(build_followup_prompt(chat_history,current_user_question))
 
-def run_clarification_prompt(original_question,analysis_response,follow_up_question):
-    return run_prompt(build_clarification_prompt(original_question,analysis_response,follow_up_question))
+def run_clarification_prompt(chat_history,analysis_response,clarification_question):
+    return run_prompt(build_clarification_prompt(chat_history,analysis_response,clarification_question))
 
 def run_series_intent_prompt(question):
     return run_prompt(build_series_intent_prompt(question))
