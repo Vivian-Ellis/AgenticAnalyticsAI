@@ -152,6 +152,13 @@ def build_general_assistant_prompt(question,available_series,recent_history=None
         prompt = template.format(question=question,available_series=available_series,recent_history=recent_history)
     return prompt
 
+def build_metadata_prompt(user_input, fred_metadata):
+    with open(PROMPTS_DIR / "metadata_prompt.txt") as f:
+        template = f.read()
+
+        prompt = template.format(fred_metadata=fred_metadata,user_input=user_input)
+    return prompt
+
 def run_prompt(prompt,max_tokens=500):
     message = client.messages.create(
         model="claude-haiku-4-5-20251001",
@@ -207,6 +214,9 @@ def run_spearman_correlation_analysis(question,context,df,ranked_df,spearman_rea
 
 def run_general_assistant(question,available_series,recent_history,max_tokens=250):
     return run_prompt(build_general_assistant_prompt(question,available_series,recent_history),max_tokens)
+
+def run_metadata_assistant(user_input, fred_metadata):
+    return run_prompt(build_metadata_prompt(user_input, fred_metadata))
 
 def run_conversation_action(user_input,chat_history):
     return run_prompt(build_conversation_action_prompt(user_input,chat_history))
