@@ -3,15 +3,18 @@ import pandas as pd
 import requests
 from time import sleep
 import duckdb
+import os
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 DB_PATH = PROJECT_ROOT / "data" / "fred_data.db"
 DATA_FILES_PATH = PROJECT_ROOT / "data"
 
+API_KEY = os.getenv("FRED_API_KEY")
+
 def fetch_fred_data():
     # returns a pandas DF with "CPIAUCSL", "UNRATE", "FEDFUNDS","GDP","PAYEMS" datasets
-    API_KEY = "e12d52ceb543405fc7b8a928461fbf5a"
+
     BASE_URL = "https://api.stlouisfed.org/fred/series/observations"
     METADATA_URL = "https://api.stlouisfed.org/fred/series"
 
@@ -37,7 +40,7 @@ def fetch_fred_data():
         df["value"] = pd.to_numeric(df["value"], errors="coerce")
         df["series_id"] = series_id    
         all_dfs.append(df)
-        sleep(0.2)  # gentle pause
+        sleep(1)  # gentle pause
 
         meta_response = requests.get(METADATA_URL, params=params, timeout=30)
         meta_response.raise_for_status()
@@ -46,7 +49,7 @@ def fetch_fred_data():
         meta_data_df = pd.DataFrame(meta_data["seriess"]).copy()
         meta_data_df = meta_data_df.rename(columns={"id": "series_id"})
         all_meta_data_df.append(meta_data_df)
-        sleep(0.2)  # gentle pause
+        sleep(1)  # gentle pause
 
     fred_data = pd.concat(all_dfs, ignore_index=True)
     fred_data.name="fred"
