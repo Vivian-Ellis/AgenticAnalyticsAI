@@ -12,6 +12,7 @@ from bokeh.models.tools import HoverTool
 import json
 
 CHARTS_DIR = Path(__file__).resolve().parents[2] / "chart_files"
+CHARTS_DIR.mkdir(parents=True, exist_ok=True) #if not exist create
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 with open(PROJECT_ROOT / "data" / "date_labels.json", "r") as f:
