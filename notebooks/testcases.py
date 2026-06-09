@@ -2,9 +2,9 @@ import sys
 sys.path.append("../src")
 
 import pandas as pd
-import analysis
-import db
-import summaries
+import Analysis.analysis as analysis
+import DataBase.db as db
+import Narration.summaries as summaries
 
 def run_case(name, question, context, results_df, stats_df):
     print("\n" + "=" * 80)

@@ -1,9 +1,9 @@
 import sys
 sys.path.append("../src")
 
-import analysis
-import db
-import summaries
+import Analysis.analysis as analysis
+import DataBase.db as db
+import Narration.summaries as summaries
 
 df=db.run_query("SELECT * FROM clean_fred_data")
 
