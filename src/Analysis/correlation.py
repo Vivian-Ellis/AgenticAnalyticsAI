@@ -1,5 +1,11 @@
+from pathlib import Path
 import sys
-sys.path.append("../src/")
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+SRC_DIR = PROJECT_ROOT / "src"
+
+sys.path.append(str(SRC_DIR))
+
 import Analysis.analysis as analysis
 import Narration.summaries as summaries
 from scipy.stats import shapiro

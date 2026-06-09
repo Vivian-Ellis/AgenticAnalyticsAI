@@ -1,5 +1,11 @@
+from pathlib import Path
 import sys
-sys.path.append("../src/")
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+SRC_DIR = PROJECT_ROOT / "src"
+
+sys.path.append(str(SRC_DIR))
+
 import Narration.summaries as summaries
 import pandas as pd
 import scipy.stats as stats
@@ -11,10 +17,6 @@ from Analysis.AnalysisResults import ComparisonResult
 from pathlib import Path
 from dotenv import load_dotenv
 import sys
-
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-SRC_DIR = PROJECT_ROOT / "src"
-sys.path.append(str(SRC_DIR))
 
 env_path = PROJECT_ROOT / ".env"
 load_dotenv(env_path, override=True)

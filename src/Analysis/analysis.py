@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import scipy.stats as stats
 from scipy import stats
-from statsmodels.stats.multicomp import pairwise_tukeyhsd
 
 def get_time_series(df, series_ids=None):
     """
