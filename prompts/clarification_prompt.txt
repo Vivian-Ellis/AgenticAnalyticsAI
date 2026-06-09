@@ -32,14 +32,14 @@ The response should:
 - avoid unsupported causal claims
 - avoid introducing external economic theory unless directly relevant
 
-Original User Question:
-{original_question}
+Rercent Chat History:
+{chat_history}
 
 Original Analysis:
 {analysis_response}
 
-User Follow-Up Question:
-{follow_up_question}
+User Clarification Question:
+{clarification_question}
 
 Important Rules:
 - Treat the original analysis as the source of truth

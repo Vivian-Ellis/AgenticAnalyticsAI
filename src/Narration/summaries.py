@@ -179,6 +179,7 @@ def run_tool_prompt(tools,message,max_tokens=500):
         model="claude-haiku-4-5-20251001",
         max_tokens=max_tokens,
         tools=tools,
+        tool_choice={"type":"any"}, #forces Claude to use at least one of the provided tools
         messages=[
             {
                 "role": "user",
