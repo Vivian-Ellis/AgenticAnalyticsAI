@@ -1,4 +1,6 @@
-from Analysis import Comparison, Ranking, Correlation
+import Analysis.Comparison as Comparison
+import Analysis.Ranking as Ranking
+import Analysis.Correlation as Correlation
 from Tools.registries.analytics_tool_registry import register_analytics_tool
 
 @register_analytics_tool(
