@@ -9,10 +9,21 @@ from pathlib import Path
 from bokeh.plotting import figure, column,output_file, save,ColumnDataSource
 from bokeh.models import NumeralTickFormatter
 from bokeh.models.tools import HoverTool
+import json
 
-# CHART_REGISTRY = {}
+CHARTS_DIR = Path(__file__).resolve().parents[2] / "chart_files"
 
-PROMPTS_DIR = Path(__file__).resolve().parents[2] / "chart_files"
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+with open(PROJECT_ROOT / "data" / "date_labels.json", "r") as f:
+    DATE_LABELS = json.load(f)
+
+def date_cleanup(table):
+    for grain in ["WEEK", "MONTH", "QUARTER"]:
+        if grain in table.columns:
+            table[grain] = (
+                table[grain]
+                .astype(str)
+                .map(DATE_LABELS[grain]))
 
 class Chart:
     def __init__(self,results,chart_type):
@@ -28,22 +39,24 @@ class Chart:
     description="Standard sorted bar chart",
     output_type="file_path")
 def build_ranking_chart(results):
+    chart_df = results.ranked_df.copy()
+    date_cleanup(chart_df)
     return Bar(
-        results.ranked_df[results.date_grain],
-        results.ranked_df["Value"],
-        "Ranking Chart"
-    )
+        chart_df[results.date_grain],
+        chart_df["Value"],
+        "Ranking Chart")
 
 @register_chart(
     "comparison_bar",
     description="Standard bar chart",
     output_type="file_path")
 def build_comparison_chart(results):
+    chart_df = results.descriptive_statistics.copy()
+    date_cleanup(chart_df)
     return Bar(
-        results.descriptive_statistics[results.date_grain],
-        results.descriptive_statistics["Value"],
-        "Comparison Chart"
-    )
+        chart_df[results.date_grain],
+        chart_df["Value"],
+        "Comparison Chart")
 
 @register_chart(
     "correlation_scatter",
@@ -70,7 +83,7 @@ class TimeSeries:
         plt.title(self.title)
         plt.xlabel(self.x)
         plt.ylabel(self.y)
-        path=f'{PROMPTS_DIR}/{self.title}{datetime.now().strftime("%Y%m%d%H%M%S")}.png'
+        path=f'{CHARTS_DIR}/{self.title}{datetime.now().strftime("%Y%m%d%H%M%S")}.png'
         plt.savefig(path)
         plt.close()
         return path
@@ -105,7 +118,7 @@ class Bar:
             top="y",
             source=table_source,
             width=0.85,
-            color="#f3cae6")
+            color="#87a6d4")
 
         # title
         table_fig.title.align = "center"
@@ -143,7 +156,7 @@ class Bar:
         )
 
         full_rating_layout = column(table_fig,background="white", sizing_mode="scale_width")
-        output_file(f'{PROMPTS_DIR}/{self.title}{datetime.now().strftime("%Y%m%d%H%M%S")}.html')
+        output_file(f'{CHARTS_DIR}/{self.title}{datetime.now().strftime("%Y%m%d%H%M%S")}.html')
         save(full_rating_layout)
         return full_rating_layout
 
@@ -159,7 +172,7 @@ class Bar:
         ).set(title=self.title)
         plt.xticks(rotation=45)
         sns.despine()
-        path = f'{PROMPTS_DIR}/{self.title}{datetime.now().strftime("%Y%m%d%H%M%S")}.png'
+        path = f'{CHARTS_DIR}/{self.title}{datetime.now().strftime("%Y%m%d%H%M%S")}.png'
         plt.savefig(path, bbox_inches='tight', dpi=300)
         plt.close()
         return path
@@ -182,7 +195,7 @@ class Scatter:
                             toolbar_location=None)
 
         # add a scatter circle renderer with a size, color, and alpha
-        table_fig.scatter(x=self.table[self.series[0]],y=self.table[self.series[1]], size=20, color="#f3cae6", alpha=0.5)
+        table_fig.scatter(x=self.table[self.series[0]],y=self.table[self.series[1]], size=20, color="#87a6d4", alpha=0.5)
 
         # title
         table_fig.title.align = "center"
@@ -215,7 +228,7 @@ class Scatter:
         )
 
         full_layout = column(table_fig,background="white",sizing_mode="scale_width")
-        output_file(f'{PROMPTS_DIR}/{self.title}{datetime.now().strftime("%Y%m%d%H%M%S")}.html')
+        output_file(f'{CHARTS_DIR}/{self.title}{datetime.now().strftime("%Y%m%d%H%M%S")}.html')
         save(full_layout)
         return full_layout
 
@@ -225,7 +238,7 @@ class Scatter:
         sns.regplot(x=self.x, y=self.y)
         sns.despine(offset=10, trim=True)
         plt.title(self.title)
-        path = f'{PROMPTS_DIR}/{self.title}{datetime.now().strftime("%Y%m%d%H%M%S")}.png'
+        path = f'{CHARTS_DIR}/{self.title}{datetime.now().strftime("%Y%m%d%H%M%S")}.png'
         plt.savefig(path, bbox_inches='tight', dpi=300)
         plt.close()
         return path

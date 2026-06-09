@@ -12,7 +12,7 @@ env_path = PROJECT_ROOT / ".env"
 load_dotenv(env_path, override=True)
 
 from Orcestrator.conversationstatehelper import clean_llm_markdown
-from Narration.summaries import run_conversation_action,run_followup,run_clarification_prompt
+from Narration.summaries import run_conversation_action,run_followup,run_clarification_prompt,run_metadata_assistant
 
 @register_conversation(
     "analytics",
@@ -30,7 +30,7 @@ from Narration.summaries import run_conversation_action,run_followup,run_clarifi
         "required": ["user_input"]
     }
 )
-def analytic_route(user_input):
+def analytic_route(user_input,session_state=None):
     agentresponse = orcestrator.run_analytics_agent(user_input)
     return {
         "summary": clean_llm_markdown(agentresponse.response['summary']),
@@ -49,7 +49,7 @@ def analytic_route(user_input):
         "required": []
     }
 )
-def greeting_route():
+def greeting_route(session_state=None):
     return {
         "summary": "Hi, I'm ready to answer questions about FRED data.",
         "chart_path": None,
@@ -69,24 +69,14 @@ def greeting_route():
             "user_input": {
                 "type": "string",
                 "description": "The user's most recent metadata or dataset availability question."
-            },
-            "fred_metadata": {
-                "type": "string",
-                "description": "Markdown table containing available FRED dataset metadata."
-            },
-            "chat_history": {
-                "type": "array",
-                "description": "Recent chat history as a list of message dictionaries.",
-                "items": {
-                    "type": "object"
-                }
             }
         },
-        "required": ["user_input", "fred_metadata"]
+        "required": ["user_input"]
     }
 )
-def metadata_inquiry_route(user_input, fred_metadata, chat_history=None):
-    response = orcestrator.run_general_agent(user_input, fred_metadata, chat_history)
+def metadata_inquiry_route(user_input,session_state=None):
+    fred_metadata = session_state.fred_metadata
+    response = run_metadata_assistant(user_input, fred_metadata)
     return {
         "summary": clean_llm_markdown(response),
         "chart_path": None,
@@ -105,19 +95,13 @@ def metadata_inquiry_route(user_input, fred_metadata, chat_history=None):
             "user_input": {
                 "type": "string",
                 "description": "The user's most recent message."
-            },
-            "chat_history": {
-                "type": "array",
-                "description": "Recent chat history as a list of message dictionaries.",
-                "items": {
-                    "type": "object"
-                }
             }
         },
         "required": ["user_input"]
     }
 )
-def analytics_followup_route(user_input, chat_history=None):
+def analytics_followup_route(user_input, session_state=None):
+    chat_history = session_state.get("messages", []) if session_state else []
     expanded_user_input=run_followup(chat_history,user_input)
     return analytic_route(expanded_user_input) #TO-DO make sure to save the enriched user input not the raw input
 
@@ -131,33 +115,24 @@ def analytics_followup_route(user_input, chat_history=None):
             "user_input": {
                 "type": "string",
                 "description": "The user's most recent message."
-            },
-            "chat_history": {
-                "type": "array",
-                "description": "Recent chat history as a list of message dictionaries.",
-                "items": {
-                    "type": "object"
-                }
-            },
-            "analysis_response": {
-                "type": "string",
-                "description": "recent analytical summary from claude."
             }
         },
-        "required": ["user_input","chat_history","analysis_response"]
+        "required": ["user_input"]
     }
 )
-def result_clarification_route(user_input, chat_history, analysis_response):
-        message=run_clarification_prompt(chat_history=chat_history,
-                                 analysis_response=analysis_response, #TO-DO send state instead
-                                 clarification_question=user_input)
-        return {
-            "summary": clean_llm_markdown(message),
-            "chart_path": None,
-            "table": None,
-            "data_plan": {"route": "result_clarification",
-                            "intent":None}
-        }
+def result_clarification_route(user_input,session_state=None):
+    chat_history = session_state.get("messages", []) if session_state else []
+    analysis_response=chat_history #TO-DO fix use methodology in state
+    message=run_clarification_prompt(chat_history=chat_history,
+                                analysis_response=analysis_response,
+                                clarification_question=user_input)
+    return {
+        "summary": clean_llm_markdown(message),
+        "chart_path": None,
+        "table": None,
+        "data_plan": {"route": "result_clarification",
+                        "intent":None}
+    }
 
 @register_conversation(
     "unsupported",
@@ -173,7 +148,7 @@ def result_clarification_route(user_input, chat_history, analysis_response):
         "required": ["user_input"]
     }
 )
-def unsupported_route(user_input):
+def unsupported_route(user_input,session_state=None):
     return {
         "summary": "Your inquiry is not supported at this time.",
         "chart_path": None,

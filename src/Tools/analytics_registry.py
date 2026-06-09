@@ -54,11 +54,31 @@ def correlation_tool(data_loader):
 
 @register_analytics_tool(
     "comparison",
-    description="""Performs statistical comparison analysis by interpreting the semantic intent of a comparison question, 
-    selecting the appropriate inferential statistical test (such as Welch’s t-test or one-way ANOVA), computing descriptive 
-    and inferential statistics across grouped data, and generating a narrated interpretation of the results. Returns a structured 
-    `ComparisonResult` object containing the comparison type, statistical test used, descriptive statistics, inferential outputs, 
-    and generated analysis summary.""",
+    description="""Performs statistical comparison analysis for questions that compare values across groups, periods, or event-defined cohorts.
+
+Use this for questions asking whether one group, period, or cohort is higher, lower, greater, smaller, more, less, different, more stable, more volatile, or otherwise different from another.
+
+Use this for questions asking whether groups differ in:
+- averages, means, levels, or rates
+- questions phrased as "higher in A or B", "lower in A or B", "more in A than B", "less in A than B", "A vs B", or "between A and B"
+- medians, when explicitly requested
+- variability, volatility, fluctuations, stability, consistency, or dispersion
+- before/after or pre/post periods
+- highest vs lowest, top vs bottom, or other grouped comparisons
+
+Examples:
+- Was inflation higher in 2018 or 2022 on average?
+- Was unemployment lower in 2024 or 2025?
+- Which year had higher average CPI, 2018 or 2022?
+- Did unemployment differ between 2024 and 2025?
+- Was inflation more volatile in 2022 than 2018?
+- Compare median unemployment rates between 2024 and 2025.
+
+The comparison analysis delegates to specialized comparison tools such as average_comparison, median_comparison, and volatility_comparison, then selects the appropriate statistical test based on the number of groups and comparison type. Examples include Welch’s t-test, one-way ANOVA, Mann-Whitney U, Kruskal-Wallis, and Levene’s test.
+
+Do not use this for ranking-only questions or relationship/association questions between multiple variables; those should route to ranking or correlation.
+
+Returns a structured `ComparisonResult` object containing the comparison type, statistical test used, descriptive statistics, inferential outputs, and generated analysis summary.""",
     input_schema={
         "type": "object",
         "properties": {
