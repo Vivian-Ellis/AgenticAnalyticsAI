@@ -3,47 +3,20 @@ sys.path.append("../src/")
 import DataBase.db as db
 import Narration.summaries as summaries
 import Tools.planner_registry as planner_registry
+from pathlib import Path
+import os
+import anthropic
 
-# class DataPlanBuilder:
-#     def __init__(self,question):
-#         self.question=question
-#         self.question_intent=None
-#         self.series_ids=None
-#         self.date_grain=None
-#         self.start_date=None
-#         self.end_date=None
-#         self.dataset_context=None
+import joblib
+import sys
+sys.path.append("../src")
 
-#     def determine_question_intent(self):
-#         #determine question intent via logreg
-#         self.question_intent=planner_registry.predict_analytical_intent(self.question)
-#         print(f"{self.question} intent: {self.question_intent}")
+client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
-#     def infer_query_parameters(self):
-#         series_ids=planner_registry.predict_series_intent(self.question)
-#         print(f"series ids: {series_ids}")
-#         #determine the date aggregation grain
-#         date_grain=planner_registry.date_aggregation_grain_intent(self.question)
-#         print(f"date grain: {date_grain}")
-#         #determine time frame of dataset via claude LLM & validate output
-#         start_date, end_date=planner_registry.timeline_intent(self.question,date_grain)
-#         print(f"timeline: {start_date} - {end_date}")
-#         self.series_ids=series_ids
-#         self.date_grain=date_grain
-#         self.start_date=start_date
-#         self.end_date=end_date
-        
-#     def infer_data_context(self):
-#         #pull the series metadata
-#         self.dataset_context=summaries.build_context(self.series_ids)
-        
-#     def run(self):
-#         self.determine_question_intent()
-#         self.infer_query_parameters()
-#         self.infer_data_context()
-        
-#         return self
-    
+from Tools.registries.planner_tool_registry import list_anthropic_planner_tools,get_planner_tool
+from Tools import planner_registry 
+import Narration.summaries
+
 class DataLoader:
     def __init__(self,data_plan):
         self.data=None
@@ -61,23 +34,6 @@ class DataLoader:
         
     def run(self):
         return self.load_data()
-
-
-
-
-from pathlib import Path
-import os
-import anthropic
-
-import joblib
-import sys
-sys.path.append("../src")
-
-client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
-
-from Tools.registries.planner_tool_registry import list_anthropic_planner_tools,get_planner_tool
-from Tools import planner_registry 
-import Narration.summaries
 
 class ClaudeDataPlanBuilder:
     def __init__(self,question):
