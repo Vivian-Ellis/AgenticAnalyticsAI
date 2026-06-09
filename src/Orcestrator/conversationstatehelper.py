@@ -64,40 +64,38 @@ def clean_llm_markdown(text: str) -> str:
 # analytics-user wants to perform some analytical task
 # greeting-user is just saying hi
 # other -this type of user input is not currently supported
-def question_routing(user_input,chat_history=None):
-    conversation_tools=list_anthropic_conversation_tools()
-    print(conversation_tools)
+def question_routing(user_input, session_state=None):
+    conversation_tools = list_anthropic_conversation_tools()
+    chat_history = session_state.get("messages", []) if session_state else []
     message = f"""You are a routing layer. You must call exactly one conversation tool.
 
-    Do not answer the user directly.
-    Do not ask clarifying questions.
-    If the message is asking for any FRED data analysis, call analytics.
+Do not answer the user directly.
+Do not ask clarifying questions.
+If the message is asking for any FRED data analysis, call analytics.
 
-    Examples:
-    - "bottom 7 unrate months in 2019" -> analytics
-    - "top 5 CPI years" -> analytics
-    - "now for CPI" -> analytics
-    - "what datasets can I use?" -> metadata_inquiry
-    - "hi" -> greeting
+Examples:
+- "bottom 7 unrate months in 2019" -> analytics
+- "top 5 CPI years" -> analytics
+- "now for CPI" -> analytics_followup
+- "what datasets can I use?" -> metadata_inquiry
+- "hi" -> greeting
 
-    Recent chat history:
-    {chat_history}
+Recent chat history:
+{chat_history}
 
-    User message:
-    {user_input}"""
-    
+User message:
+{user_input}"""
     # Claude chooses to call the tool
-    message_content=summaries.run_tool_prompt(conversation_tools,message)
-    print(message_content)
+    message_content = summaries.run_tool_prompt(conversation_tools, message)
     result = None
     # Python executes the tool
     for block in message_content:
         if block.type == "tool_use":
             tool = get_conversation_tool(block.name)
-            result = tool["function"](**block.input)
+            tool_input = dict(block.input)
+            tool_input["session_state"] = session_state
+            result = tool["function"](**tool_input)
             break
-
     if result is None:
-        raise ValueError("Claude did not call a conversation tool.")
-
+        raise ValueError(f"Claude did not call a conversation tool. Response was: {message_content}")
     return result

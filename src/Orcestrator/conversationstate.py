@@ -18,7 +18,7 @@ from streamlit_bokeh import streamlit_bokeh
 def load_metadata():
     return db.get_series_metadata()
 
-fred_metadata = load_metadata()[["series_id","title","frequency","observation_start","observation_end"]].to_markdown(index=False)
+st.session_state.fred_metadata = load_metadata()[["series_id","title","frequency","observation_start","observation_end"]].to_markdown(index=False)
 
 markdown_style = Path("appmarkdownstyle.txt").read_text()
 
@@ -87,11 +87,12 @@ if user_input:
     # generate assistant response
     with st.chat_message("assistant", avatar=None):
         with st.spinner("Analyzing..."):
-            result=helper.question_routing(user_input=user_input,chat_history=st.session_state.messages)
+            result=helper.question_routing(user_input=user_input,session_state=st.session_state)
             assistant_msg = {
                 "role": "assistant",
                 "content": result["summary"],
                 "data_plan": result.get("data_plan", {}),
+                "methodology_reasoning": result.get("methodology_reasoning", {}),
                 "table": result.get("table"),
                 "chart_path": result.get("chart_path")}
 
