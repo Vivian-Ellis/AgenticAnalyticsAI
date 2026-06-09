@@ -11,8 +11,6 @@ import joblib
 import sys
 sys.path.append("../src")
 
-client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
-
 from Tools.registries.planner_tool_registry import list_anthropic_planner_tools,get_planner_tool
 from Tools import planner_registry 
 import Narration.summaries
