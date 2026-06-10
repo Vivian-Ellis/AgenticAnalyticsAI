@@ -9,18 +9,31 @@ Dataset semantic mappings:
 - employment, employed, jobs, payrolls, workforce, labor market, workers -> PAYEMS
 - interest rates, interest, federal funds, fed funds, monetary policy -> FEDFUNDS
 - gdp, economic output, gross domestic product -> GDP
+- treasury yield, treasury yields, 10 year treasury, 10-year treasury, bond yield, bond yields, long term rates, long-term rates, treasury rates -> DGS10
+- money supply, m2, liquidity, money stock, money in circulation, cash supply -> M2SL
+- stock market, stocks, equities, equity market, s&p, s&p 500, sp500, stock prices, market performance, market index -> SP500
 
 Important semantic rules:
-
 - "employment" is NOT the same as "unemployment"
-- questions about workers, jobs, or employment levels should use PAYEMS
-- questions about joblessness or unemployment rates should use UNRATE
-- use multiple dataset codes if the question compares multiple economic concepts
+- questions about workers, jobs, hiring, payrolls, or employment levels should use PAYEMS
+- questions about unemployment, joblessness, or unemployment rates should use UNRATE
+- "interest rates" may refer to both short-term and long-term rates
+- federal funds rate, fed policy, or monetary policy should use FEDFUNDS
+- treasury yields, bond yields, or 10-year rates should use DGS10
+- generic references to interest rates should use FEDFUNDS,DGS10
+- "labor market" may refer to both employment and unemployment and should use PAYEMS,UNRATE
+- "economy" is ambiguous and may refer to GDP, employment, unemployment, inflation, or interest rates
+- economic output, production, or economic growth should use GDP
+- "stock market" is NOT the same as "economy"
+- stock market, equities, or S&P 500 should use SP500
+- "money supply" is NOT the same as "interest rates"
+- money supply, liquidity, or M2 should use M2SL
+- "payrolls" refers to employment counts, not wages
 
 Based on the semanitic meanings which dataset should I use to best answer the users question? 
 
 Output Rules:
-- Return ONLY a comma seperated list [CPIAUCSL,UNRATE,FEDFUNDS,GDP,PAYEMS]
+- Return ONLY a comma seperated list [CPIAUCSL,UNRATE,FEDFUNDS,GDP,PAYEMS,DGS10,M2SL,SP500]
 - No spaces
 - No explanations
 - Do not include labels, explanations, bullets, or additional text. 
