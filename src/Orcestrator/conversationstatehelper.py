@@ -19,6 +19,8 @@ sys.path.append(str(SRC_DIR))
 env_path = PROJECT_ROOT / ".env"
 load_dotenv(env_path, override=True)
 
+CONVERSATION_TOOLS = list_anthropic_conversation_tools()
+
 def date_cleanup(table):
     for grain in ["WEEK", "MONTH", "QUARTER"]:
         if grain in table.columns:
@@ -65,28 +67,44 @@ def clean_llm_markdown(text: str) -> str:
 # greeting-user is just saying hi
 # other -this type of user input is not currently supported
 def question_routing(user_input, session_state=None):
-    conversation_tools = list_anthropic_conversation_tools()
     chat_history = session_state.get("messages", []) if session_state else []
-    message = f"""You are a routing layer. You must call exactly one conversation tool.
+    message = f"""
+    Choose exactly one route.
 
-Do not answer the user directly.
-Do not ask clarifying questions.
-If the message is asking for any FRED data analysis, call analytics.
+    Routes:
+    - analytics: new FRED statistical analysis
+    - analytics_followup: modify previous analysis
+    - result_clarification: explain previous result
+    - metadata_inquiry: available datasets, definitions, units, frequency, date ranges
+    - greeting: greeting only
+    - assistance_needed: help or examples
+    - data_source: where data comes from
+    - data_preview: preview rows
+    - unsupported: out of scope
 
-Examples:
-- "bottom 7 unrate months in 2019" -> analytics
-- "top 5 CPI years" -> analytics
-- "now for CPI" -> analytics_followup
-- "what datasets can I use?" -> metadata_inquiry
-- "hi" -> greeting
+    User:
+    {user_input}
+    """
+#     message = f"""You are a routing layer. You must call exactly one conversation tool.
 
-Recent chat history:
-{chat_history}
+# Do not answer the user directly.
+# Do not ask clarifying questions.
+# If the message is asking for any FRED data analysis, call analytics.
 
-User message:
-{user_input}"""
+# Examples:
+# - "bottom 7 unrate months in 2019" -> analytics
+# - "top 5 CPI years" -> analytics
+# - "now for CPI" -> analytics_followup
+# - "what datasets can I use?" -> metadata_inquiry
+# - "hi" -> greeting
+
+# Recent chat history:
+# {chat_history}
+
+# User message:
+# {user_input}"""
     # Claude chooses to call the tool
-    message_content = summaries.run_tool_prompt(conversation_tools, message)
+    message_content = summaries.run_tool_prompt(CONVERSATION_TOOLS , message)
     result = None
     # Python executes the tool
     for block in message_content:

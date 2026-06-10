@@ -5,8 +5,8 @@ import DataBase.db as db
 import streamlit as st #for the streamlit community cloud secert
 
 PROMPTS_DIR = Path(__file__).resolve().parents[2] / "prompts"
-# api_key=os.getenv("ANTHROPIC_API_KEY") #local key
-api_key = st.secrets.get("ANTHROPIC_API_KEY") or os.getenv("ANTHROPIC_API_KEY") #streamlit key
+api_key=os.getenv("ANTHROPIC_API_KEY") #local key
+# api_key = st.secrets.get("ANTHROPIC_API_KEY") or os.getenv("ANTHROPIC_API_KEY") #streamlit key
 client = anthropic.Anthropic(api_key=api_key)
 
 def build_series_intent_prompt(question):
@@ -194,10 +194,8 @@ def run_tool_prompt(tools,message,max_tokens=500):
 
 def build_context(series_ids):
     context=""
-
     for series in series_ids:
         metadata=db.get_series_metadata(series_id=series)
-        print(f"{metadata['title']}")
         context+=f"""This is the {metadata['title'][0]} dataset. 
         About the dataset:
         {metadata['notes'][0]}

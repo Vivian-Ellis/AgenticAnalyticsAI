@@ -13,14 +13,61 @@ import conversationstatehelper as helper
 import streamlit as st
 from streamlit_bokeh import streamlit_bokeh
 
+from datetime import datetime
+import time
+
 #pull the FRED metadata for available datasets
 @st.cache_data(show_spinner=False)
 def load_metadata():
     return db.get_series_metadata()
 
-st.session_state.fred_metadata = load_metadata()[["series_id","title","frequency","observation_start","observation_end"]].to_markdown(index=False)
+st.session_state.fred_metadata = load_metadata()[["series_id","title","frequency","observation_start","observation_end","description","updated_title"]]
 
 markdown_style = Path("appmarkdownstyle.txt").read_text()
+
+#sytling and helpful info for newbies
+HELP_MESSAGE = """
+### Need Help?
+I'm here to provide statistical analysis of Federal Reserve Economic Data (FRED). 
+
+### What to ask?
+
+**🏆 Rankings**
+- Top 5 unemployment years
+- Lowest GDP quarters over the past 10 years.
+
+**⚖️ Comparisons**
+- Compare federal funds rates before and after 2020.
+- Compare median employment levels before and after COVID.
+- Compare unemployment volatility between 2024 and 2025.
+
+**🔗 Correlations**
+- Is there a relationship between interest rates and unemployment?
+- How strongly are GDP and employment levels correlated?
+
+**📚 Metadata**
+- What datasets are available?
+- What does CPI mean?
+
+**🔄 Follow-ups**
+- Now do GDP
+- Make it monthly
+- Bottom 6 instead
+
+**💡Clarifications**
+- Why did you use Spearman?
+- Explain the p-value.
+"""
+
+col1, col2 = st.columns([4, 1])
+
+with col1:
+    st.write("### FRED Analytics AI Agent")
+
+with col2:
+    with st.popover("Help",icon="❔"):
+        st.markdown(HELP_MESSAGE)
+# end help message
 
 def markdown_table(table,analysis_type):
     #for rank
@@ -62,9 +109,31 @@ st.markdown(markdown_style,unsafe_allow_html=True)
 # input text box at bottom
 user_input = st.chat_input("Ask anything...", key="chat_input")
 
+# initialize starting_suggestions
+if "starting_suggestions" not in st.session_state:
+    st.session_state.starting_suggestions = None
+
+#new chat with the suggestion selected
+if not user_input and st.session_state.get("starting_suggestions"):
+        basic_suggestion=st.session_state.starting_suggestions
+        if basic_suggestion=="📊 Interest rates & unemployment":
+            user_input = "Is there a relationship between interest rates and unemployment?"
+        elif basic_suggestion=="🏆 Top 5 Unemployment Years":
+            user_input = "Rank the top 5 unemployment years."
+        elif basic_suggestion=="⚖️ Inflation: 2024 vs 2025":
+            user_input = "Was inflation higher in 2024 than in 2025?"
+        elif basic_suggestion=="🗃️ Available Datasets":
+            user_input = "What are the available FRED datasets?"
+
 # intro message only on a fresh chat before first user input
 if len(st.session_state.messages) == 0 and not user_input:
     st.write("Ask me anything about the Federal Reserve Economic Data (FRED).")
+
+    #provide suggestions only on a new chat
+    selection = st.pills("Suggestions", 
+                         ["📊 Interest rates & unemployment","🏆 Top 5 Unemployment Years","⚖️ Inflation: 2024 vs 2025","🗃️ Available Datasets"],
+                         label_visibility="hidden",
+                         key="starting_suggestions")
 
 # render existing chat history
 for msg in st.session_state.messages:
@@ -87,7 +156,12 @@ if user_input:
     # generate assistant response
     with st.chat_message("assistant", avatar=None):
         with st.spinner("Analyzing..."):
+            # Record time
+            start_time = datetime.now()
             result=helper.question_routing(user_input=user_input,session_state=st.session_state)
+            end_time = datetime.now()
+            duration = end_time - start_time
+            print(f"Duration:   {duration}")
             assistant_msg = {
                 "role": "assistant",
                 "content": result["summary"],
@@ -97,6 +171,6 @@ if user_input:
                 "chart_path": result.get("chart_path")}
 
             render_assistant_message(assistant_msg)
-            print(assistant_msg)
+            # print(assistant_msg)
         # append to chat history
         st.session_state.messages.append(assistant_msg)
