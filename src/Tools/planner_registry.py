@@ -108,9 +108,9 @@ def predict_series_intent(question):
     returns only the list of series_id of the datasets
     """
     top_results=[]
-    metadata = db.get_series_metadata()
-    metadata["aliases"] = metadata["series_id"].map(lambda x: " ".join(SERIES_ALIASES.get(x, [])))    
-    metadata["search_text"] = (metadata["series_id"] + " " + metadata["title"]+" "+metadata["aliases"])
+    # metadata = db.get_series_metadata()
+    # metadata["aliases"] = metadata["series_id"].map(lambda x: " ".join(SERIES_ALIASES.get(x, [])))    
+    # metadata["search_text"] = (metadata["series_id"] + " " + metadata["title"]+" "+metadata["aliases"])
     inferred_series_intent = summaries.run_series_intent_prompt(question)
     top_results.extend(inferred_series_intent.split(','))
     return top_results
@@ -141,7 +141,7 @@ def timeline_intent(question,date_grain):
     
     returns a start and end date in the format YYYY-MM-DD to be used to filter a df down
     """
-    metadata=db.run_query("SELECT max(observation_end) as last_observation_date FROM raw_fred_metadata")
+    metadata=db.run_query("SELECT max(observation_end) as last_observation_date FROM clean_fred_metadata")
     last_observation_date=metadata['last_observation_date'][0]
     prompt=summaries.build_timeframe_prompt(question,last_observation_date,date_grain)
     date_range= summaries.run_prompt(prompt)
