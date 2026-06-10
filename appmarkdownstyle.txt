@@ -3,7 +3,7 @@
         font-family: 'Inter', sans-serif;
     }
     .stButton > button {
-        border-radius: 28px;
+        border-radius: 18px;
     }
 
     [data-testid="stSidebar"] {
@@ -33,73 +33,28 @@
 
     [data-testid="stChatInput"] {
         background-color: #F9F1EC !important;
-
-        border-radius: 999px !important;
-
-        border: 1px solid #EEE2DA !important;
-
-        padding:
-            0.35rem
-            0.45rem
-            0.35rem
-            1rem !important;
-
+        border: 1px solid #F9F1EC !important;
+        border-radius: 18px;
         box-shadow:
             0 3px 12px rgba(0,0,0,0.05) !important;
     }
 
-    /* remove inner backgrounds */
-    [data-testid="stChatInput"] * {
-        background-color: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-    }
-
-    /* textarea */
-    [data-testid="stChatInput"] textarea {
-        color: #1D1D19 !important;
-
-        font-size: 15px !important;
-
-        line-height: 1.4 !important;
-
-        padding-top: 0.55rem !important;
-
-        min-height: 24px !important;
-    }
-
-    /* placeholder */
-    [data-testid="stChatInput"] textarea::placeholder {
-        color: #8C7F78 !important;
-        opacity: 1 !important;
-    }
-
     /* send button */
     [data-testid="stChatInput"] button {
-        background-color: rgba(255,255,255,0.58) !important;
-
-        border-radius: 999px !important;
-
+        background-color: rgba(195, 210, 233, 0.58) !important;
+        border-radius: 12px !important;
         height: 2.15rem !important;
-        width: 2.15rem !important;
-
+        width: 2.75rem !important;
         transition: all 0.15s ease;
     }
 
-    [data-testid="stChatInput"] button:hover {
+   [data-testid="stChatInput"] button:hover {
         background-color: rgba(255,255,255,0.78) !important;
     }
 
     /* send icon */
     [data-testid="stChatInput"] svg {
         color: #756963 !important;
-    }
-
-    
-    /* dataframe container */
-    [data-testid="stDataFrame"] {
-        border-radius: 12px;
-        overflow: hidden;
     }
 
     /* header cells */
@@ -110,15 +65,29 @@
         border-bottom: 1px solid #F0E7E2 !important;
     }
 
-    /* optional row styling */
-    [data-testid="stDataFrame"] [role="gridcell"] {
-        background-color: #FEFCFA !important;
+    /* =========================
+       Suggestion Pill Buttons
+       ========================= */
+
+    div[data-baseweb="button-group"][role="radiogroup"] {
+        justify-content: center !important;
     }
 
-    /* optional hover effect */
-    [data-testid="stDataFrame"] [role="row"]:hover {
-        background-color: #F9F1EC !important;
+    /* =========================
+       Help Button
+       ========================= */
+    button[kind="secondary"] {
+        background-color: #fffaf5 !important;
+        border-color: #fffaf5 !important;
+        box-shadow:
+            0 3px 12px rgba(0,0,0,0.05) !important;
     }
 
-
+    button[kind="secondary"]:hover,
+    button[kind="secondary"]:active,
+    button[kind="secondary"]:focus,
+    button[kind="secondary"]:focus-visible {
+        background-color: rgba(195, 210, 233, 0.45) !important;
+        border-color: rgba(195, 210, 233, 0.45) !important;
+    }
     </style>
