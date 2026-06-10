@@ -51,32 +51,16 @@ def describe_table(table_name):
 def get_series_metadata(series_id=None):
     if series_id:
         query = f"""
-        SELECT
-            series_id,
-            split(title, ':')[1] as title,
-            frequency,
-            units,
-            seasonal_adjustment,
-            observation_start,
-            observation_end,
-            notes
-        FROM raw_fred_metadata
+        SELECT *
+        FROM clean_fred_metadata
         WHERE series_id='{series_id}'
         ORDER BY series_id
         """
         return run_query(query)
     else:
         query = """
-        SELECT
-            series_id,
-            split(title, ':')[1] as title,
-            frequency,
-            units,
-            seasonal_adjustment,
-            observation_start,
-            observation_end,
-            notes
-        FROM raw_fred_metadata
+        SELECT *
+        FROM clean_fred_metadata
         ORDER BY series_id
         """
         return run_query(query)
@@ -97,13 +81,23 @@ def get_date_ranges(table_name="clean_fred_data"):
     """
     return run_query(query)
 
-def get_table_preview(table_name="clean_fred_data", limit=5):
+def get_table_preview(table_name="clean_fred_data", series_ids=None,limit=5):
     """
     Return the first few rows of a table.
     """
-    query = f"""
-    SELECT *
-    FROM {table_name}
-    LIMIT {limit}
-    """
+    if series_ids:
+        series_ids_sql = ",".join(f"'{s.strip()}'" for s in series_ids) #convert from python list to sql list
+
+        query = f"""
+        SELECT *
+        FROM {table_name}
+        WHERE series_id in ({series_ids_sql})
+        LIMIT {limit}
+        """
+    else:
+        query = f"""
+        SELECT *
+        FROM {table_name}
+        LIMIT {limit}
+        """
     return run_query(query)
