@@ -4,7 +4,7 @@ from Tools.registries.chart_tool_registry import get_chart_tool
 import pandas as pd
 
 class AgentValidator:
-    VALID_INTENTS = {"ranking", "comparison", "correlation"}
+    VALID_INTENTS = {"ranking", "comparison", "correlation","trend"}
     VALID_DATE_GRAINS = {"DAY", "MONTH", "QUARTER", "YEAR"}
 
     @staticmethod
@@ -108,6 +108,16 @@ class AgentValidator:
                 raise ValueError(
                     "Comparison analysis requires at least two date groups.")
 
+        if data_loader.data_plan.question_intent == "trend":
+            if len(data_loader.data_plan.series_ids) != 1:
+                raise ValueError("Trend analysis requires exactly one series_id.")
+
+            if data_loader.data["date"].nunique() < 3:
+                raise ValueError("Trend analysis requires at least three time periods.")
+
+            if data_loader.data["value"].dropna().nunique() < 2:
+                raise ValueError("Trend analysis requires variation in values.")
+
         return True
 
     @staticmethod
@@ -142,6 +152,12 @@ class AgentValidator:
 
         elif result.intent == "correlation":
             required_attrs = ["corr_df", "corr_method", "spearman_reason"]
+        elif result.intent == "trend":
+            required_attrs = [
+                "metrics",
+                "trends_df",
+                "series_semantics"
+            ]
         else:
             raise ValueError(f"Unsupported result intent: {result.intent}")
         for attr in required_attrs:

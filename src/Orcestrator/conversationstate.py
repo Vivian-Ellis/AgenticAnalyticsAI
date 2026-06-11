@@ -32,6 +32,10 @@ I'm here to provide statistical analysis of Federal Reserve Economic Data (FRED)
 
 ### What to ask?
 
+**📈 Trends**
+- How has payroll employment changed over time?
+- When did inflation begin accelerating?
+
 **🏆 Rankings**
 - Top 5 unemployment years
 - Lowest GDP quarters over the past 10 years.
@@ -116,8 +120,10 @@ if "starting_suggestions" not in st.session_state:
 #new chat with the suggestion selected
 if not user_input and st.session_state.get("starting_suggestions"):
         basic_suggestion=st.session_state.starting_suggestions
-        if basic_suggestion=="📊 Interest rates & unemployment":
+        if basic_suggestion=="📊 Interest rates & Unemployment Correlation":
             user_input = "Is there a relationship between interest rates and unemployment?"
+        elif basic_suggestion=="📈GDP Trends":
+            user_input = "Analyse how GDP trends have changed over time."
         elif basic_suggestion=="🏆 Top 5 Unemployment Years":
             user_input = "Rank the top 5 unemployment years."
         elif basic_suggestion=="⚖️ Inflation: 2024 vs 2025":
@@ -131,7 +137,7 @@ if len(st.session_state.messages) == 0 and not user_input:
 
     #provide suggestions only on a new chat
     selection = st.pills("Suggestions", 
-                         ["📊 Interest rates & unemployment","🏆 Top 5 Unemployment Years","⚖️ Inflation: 2024 vs 2025","🗃️ Available Datasets"],
+                         ["📈GDP Trends","📊 Interest rates & Unemployment Correlation","🏆 Top 5 Unemployment Years","⚖️ Inflation: 2024 vs 2025","🗃️ Available Datasets"],
                          label_visibility="hidden",
                          key="starting_suggestions")
 

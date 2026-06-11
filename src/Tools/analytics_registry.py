@@ -1,7 +1,27 @@
-import Analysis.Comparison as Comparison
-import Analysis.Ranking as Ranking
-import Analysis.Correlation as Correlation
+from Analysis import Comparison,Ranking,Correlation,Trend
 from Tools.registries.analytics_tool_registry import register_analytics_tool
+
+@register_analytics_tool(
+    "trend",
+    description="""Analyzes trends in a time series, including direction, growth, volatility, and periods of acceleration or slowdown.""",
+    input_schema={
+        "type": "object",
+        "properties": {
+            "data_loader": {
+                "type": "object",
+                "description": "DataLoader object containing a DataPlan (from DataPlanBuilder) and analysis-ready metadata."
+            }
+        },
+        "required": ["data_loader"]
+    },
+    default_chart="trends_timeseries"
+)
+def trend_tool(data_loader):
+    """
+    Run trend analysis.
+    """
+    analysis = Trend.TrendAnalysis(data_loader)
+    return analysis.run_analysis()
 
 @register_analytics_tool(
     "ranking",
@@ -100,3 +120,21 @@ def comparison_tool(data_loader):
     """
     analysis = Comparison.ComparisonAnalysis(data_loader)
     return analysis.run_analysis()
+
+# @register_analytics_tool(
+#     "unsupported",
+#     description="""Uknown type of analysis the user is requesting to perform.""",
+#     input_schema={
+#         "type": "object",
+#         "properties": {
+#             "data_loader": {
+#                 "type": "object",
+#                 "description": "DataLoader object containing a DataPlan (from DataPlanBuilder) and analysis-ready metadata."
+#             }
+#         },
+#         "required": [""]
+#     },
+#     default_chart=None
+# )
+# def unsupported_analysis_tool():
+#     return None

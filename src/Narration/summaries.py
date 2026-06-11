@@ -2,7 +2,7 @@ from pathlib import Path
 import os
 import anthropic
 import DataBase.db as db
-import streamlit as st #for the streamlit community cloud secert
+# import streamlit as st #for the streamlit community cloud secert
 
 PROMPTS_DIR = Path(__file__).resolve().parents[2] / "prompts"
 api_key=os.getenv("ANTHROPIC_API_KEY") #local key
@@ -45,6 +45,14 @@ def build_spearman_correlation_analysis_prompt(question,context,corr_df,stats_df
         template = f.read()
 
         prompt = template.format(spearman_reason=spearman_reason,question=question,context=context,corr_df=corr_df,stats_df=stats_df)
+    return prompt
+
+def build_trend_analysis_prompt(metrics,trend_summary,series_semantics):
+    with open(PROMPTS_DIR / "trend_analysis_prompt.txt") as f:
+        template = f.read()
+        prompt = template.format(metrics=metrics,
+                                 trend_summary=trend_summary,
+                                 series_semantics=series_semantics)
     return prompt
 
 def build_ranking_analysis_prompt(question,context,df,ranked_df,sort_field,ascending,n,aggregation_method,group_by):
@@ -164,7 +172,8 @@ def build_metadata_prompt(user_input, fred_metadata):
 
 def run_prompt(prompt,max_tokens=500):
     message = client.messages.create(
-        model="claude-haiku-4-5-20251001",
+        # model="claude-haiku-4-5-20251001",
+        model="claude-opus-4-8",
         max_tokens=max_tokens,
         messages=[
             {
@@ -204,6 +213,9 @@ def build_context(series_ids):
 
 def run_comparison_analysis(question,context,comparison_type,statistical_test,df_preview,descriptive_statistics,inferential_statistics):
     return run_prompt(build_comparison_analysis_prompt(question,context,comparison_type,statistical_test,df_preview,descriptive_statistics,inferential_statistics))
+
+def run_trend_analysis(metrics,trend_summary,series_semantics):
+    return run_prompt(build_trend_analysis_prompt(metrics,trend_summary,series_semantics))
 
 def run_ranking_analysis(question,context,df,ranked_df,sort_field,ascending,n,aggregation_method,group_by):
     return run_prompt(build_ranking_analysis_prompt(question,context,df,ranked_df,sort_field,ascending,n,aggregation_method,group_by))

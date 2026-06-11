@@ -70,24 +70,85 @@ def build_correlation_chart(results):
         results.series_ids,
         "Correlation Scatter Chart"
     )
+
+@register_chart(
+    "trends_timeseries",
+    description="Standard timeseries chart",
+    output_type="file_path")
+def build_correlation_chart(results):
+    return TimeSeries(results.original_df)
     
 class TimeSeries:
-    def __init__(self,df,x,y,title):
+    def __init__(self,df):
         self.df=df
-        self.x=x
-        self.y=y
-        self.title=title
 
     def plot(self):
-        plt.figure(figsize=(12,6))
-        plt.plot(self.df[self.x], self.df[self.y])
-        plt.title(self.title)
-        plt.xlabel(self.x)
-        plt.ylabel(self.y)
-        path=f'{CHARTS_DIR}/{self.title}{datetime.now().strftime("%Y%m%d%H%M%S")}.png'
-        plt.savefig(path)
-        plt.close()
-        return path
+        x='date'
+        y='value'
+        print(self.df.head())
+        min_date_observation=self.df.YEAR.min()
+
+        source = ColumnDataSource(data=dict(date=self.df[x], y=self.df[y]))
+        title=f"{self.df.series_id.unique()[0]} Trends Since {min_date_observation}"
+        fig = figure(width=600,
+                    height=600,   # square
+                    tools="xpan,xwheel_zoom,reset",
+                    x_axis_type="datetime",
+                    x_axis_location="above",
+                    window_axis="x",
+                    sizing_mode="scale_width",
+                    title=title,
+                    y_axis_label="Value"
+                    )
+
+        # title
+        fig.title.align = "center"
+        fig.title.text_color = "black"
+        fig.title.text_font_size = "16px"
+        fig.title.text_font_style = "normal"
+        fig.title.text_font = "Sans-Serif"
+
+        # axis labels
+        fig.xaxis.axis_label_text_font_size = "12pt"
+        fig.yaxis.axis_label_text_font_size = "12pt"
+        fig.xaxis.axis_label_text_font_style = "normal"
+        fig.yaxis.axis_label_text_font_style = "normal"
+        # tick labels
+        fig.xaxis.major_label_text_font_style = "normal"
+        fig.yaxis.major_label_text_font_style = "normal"
+
+        # remove outer plot border
+        # fig.outline_line_color = None
+
+        # remove axis lines
+        fig.xaxis.axis_line_color ="grey"
+        fig.yaxis.axis_line_color ="grey"
+
+        # remove tick marks
+        fig.xaxis.major_tick_line_color = None
+        fig.xaxis.minor_tick_line_color = None
+        fig.yaxis.major_tick_line_color = None
+        fig.yaxis.minor_tick_line_color = None
+
+        fig.line('date', 'y', source=source,color="#87a6d4",line_width=2)
+
+        fig.add_tools(
+            HoverTool(
+                tooltips=[
+                    ("Date", "@date{%Y-%m}"),
+                    ("Value", "@y{0.00}")
+                ],
+                formatters={
+                    "@date": "datetime"
+                },
+                mode='vline'
+            )
+        )
+
+        full_trend_layout = column(fig,background="white", sizing_mode="scale_width")
+        output_file(f'{CHARTS_DIR}/{title}{datetime.now().strftime("%Y%m%d%H%M%S")}.html')
+        save(full_trend_layout)
+        return full_trend_layout
 
 class Bar:
     def __init__(self,x,y,title):

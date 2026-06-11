@@ -12,6 +12,12 @@ class BaseResult:
     summary_narration: str
 
 @dataclass
+class TrendResult(BaseResult):
+    metrics: pd.DataFrame
+    series_semantics: str
+    trends_df: pd.DataFrame
+
+@dataclass
 class RankingResult(BaseResult):
     ranked_df: pd.DataFrame
     ascending: bool
