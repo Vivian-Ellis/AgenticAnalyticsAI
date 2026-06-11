@@ -2,11 +2,11 @@ from pathlib import Path
 import os
 import anthropic
 import DataBase.db as db
-# import streamlit as st #for the streamlit community cloud secert
+import streamlit as st #for the streamlit community cloud secert
 
 PROMPTS_DIR = Path(__file__).resolve().parents[2] / "prompts"
-api_key=os.getenv("ANTHROPIC_API_KEY") #local key
-# api_key = st.secrets.get("ANTHROPIC_API_KEY") or os.getenv("ANTHROPIC_API_KEY") #streamlit key
+# api_key=os.getenv("ANTHROPIC_API_KEY") #local key
+api_key = st.secrets.get("ANTHROPIC_API_KEY") or os.getenv("ANTHROPIC_API_KEY") #streamlit key
 client = anthropic.Anthropic(api_key=api_key)
 
 def build_series_intent_prompt(question):
