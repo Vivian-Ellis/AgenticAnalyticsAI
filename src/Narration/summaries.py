@@ -2,11 +2,11 @@ from pathlib import Path
 import os
 import anthropic
 import DataBase.db as db
-import streamlit as st #for the streamlit community cloud secert
+# import streamlit as st #for the streamlit community cloud secert
 
 PROMPTS_DIR = Path(__file__).resolve().parents[2] / "prompts"
-# api_key=os.getenv("ANTHROPIC_API_KEY") #local key
-api_key = st.secrets.get("ANTHROPIC_API_KEY") or os.getenv("ANTHROPIC_API_KEY") #streamlit key
+api_key=os.getenv("ANTHROPIC_API_KEY") #local key
+# api_key = st.secrets.get("ANTHROPIC_API_KEY") or os.getenv("ANTHROPIC_API_KEY") #streamlit key
 client = anthropic.Anthropic(api_key=api_key)
 
 def build_series_intent_prompt(question):
@@ -170,10 +170,10 @@ def build_metadata_prompt(user_input, fred_metadata):
         prompt = template.format(fred_metadata=fred_metadata,user_input=user_input)
     return prompt
 
-def run_prompt(prompt,max_tokens=500):
+def run_prompt(prompt,max_tokens=500,model="claude-opus-4-8"):
     message = client.messages.create(
         # model="claude-haiku-4-5-20251001",
-        model="claude-opus-4-8",
+        model=model,
         max_tokens=max_tokens,
         messages=[
             {
@@ -191,7 +191,7 @@ def run_tool_prompt(tools,message,max_tokens=500):
         model="claude-haiku-4-5-20251001",
         max_tokens=max_tokens,
         tools=tools,
-        tool_choice={"type":"any"}, #forces Claude to use at least one of the provided tools
+        tool_choice={"type":"any","disable_parallel_tool_use":True}, #forces Claude to use at least one of the provided tools
         messages=[
             {
                 "role": "user",

@@ -8,6 +8,9 @@ from Tools.registries.conversation_tool_registry import list_anthropic_conversat
 from Tools import conversation_registry #need to import this because it populates the resigstry with all the tools in the script
 from Narration import summaries
 
+from datetime import datetime
+import time
+
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 with open(PROJECT_ROOT / "data" / "date_labels.json", "r") as f:
@@ -68,20 +71,7 @@ def clean_llm_markdown(text: str) -> str:
 # other -this type of user input is not currently supported
 def question_routing(user_input, session_state=None):
     chat_history = session_state.get("messages", []) if session_state else []
-    message = f"""
-    Choose exactly one route.
-
-    Routes:
-    - analytics: new FRED statistical analysis
-    - analytics_followup: modify previous analysis
-    - result_clarification: explain previous result
-    - metadata_inquiry: available datasets, definitions, units, frequency, date ranges
-    - greeting: greeting only
-    - assistance_needed: help or examples
-    - data_source: where data comes from
-    - data_preview: preview rows
-    - unsupported: out of scope
-
+    message = f"""select exactly one tool, do not explain.
     User:
     {user_input}
     """
@@ -104,6 +94,7 @@ def question_routing(user_input, session_state=None):
 # User message:
 # {user_input}"""
     # Claude chooses to call the tool
+    start_time = datetime.now()
     message_content = summaries.run_tool_prompt(CONVERSATION_TOOLS , message)
     result = None
     # Python executes the tool
@@ -116,4 +107,8 @@ def question_routing(user_input, session_state=None):
             break
     if result is None:
         raise ValueError(f"Claude did not call a conversation tool. Response was: {message_content}")
+
+    end_time = datetime.now()
+    duration = end_time - start_time
+    print(f"Conversation Route Duration:   {duration}")
     return result

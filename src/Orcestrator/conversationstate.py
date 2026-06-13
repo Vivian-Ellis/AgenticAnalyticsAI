@@ -65,8 +65,8 @@ I'm here to provide statistical analysis of Federal Reserve Economic Data (FRED)
 
 col1, col2 = st.columns([4, 1])
 
-with col1:
-    st.write("### FRED Analytics AI Agent")
+# with col1:
+#     st.write("### FRED Analytics AI Agent")
 
 with col2:
     with st.popover("Help",icon="❔"):
