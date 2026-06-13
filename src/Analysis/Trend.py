@@ -29,6 +29,25 @@ class TrendAnalysis:
         # Total percent change from start date to end date
         total_percent_change_start_end = ((df[y].iloc[-1] - df[y].iloc[0]) / df[y].iloc[0]) * 100
 
+        # Total percent change from start date to end date
+        total_percent_change_start_end = ((df[y].iloc[-1] - df[y].iloc[0]) / df[y].iloc[0]) * 100
+
+        # CAGR (Annualized growth rate)
+        num_years = df.year.nunique()
+        cagr = ((df[y].iloc[-1] / df[y].iloc[0]) ** (1 / num_years) - 1) * 100
+
+        # CAGR (Annualized growth rate for recent years)
+        num_recent_years=round(num_years*.1)
+        recent_years=df[df['year']>=(df['year'].max()-num_recent_years)]
+        recent_years_cagr = ((recent_years['value'].iloc[-1] / recent_years['value'].iloc[0]) ** (1 / num_recent_years) - 1) * 100
+
+        growth_regime = (
+            "accelerating"
+            if recent_years_cagr > cagr * 1.15
+            else "decelerating"
+            if recent_years_cagr < cagr * 0.85
+            else "stable")
+
         # year-over-year change
         df = df.sort_values(x)
         df["yoy_change"] = (df["value"].pct_change(12) * 100)
@@ -37,13 +56,6 @@ class TrendAnalysis:
         #volatility
         volatility = df["value"].pct_change().std()
 
-        if volatility < 0.005:
-            volatility_level = "low"
-        elif volatility < 0.02:
-            volatility_level = "moderate"
-        else:
-            volatility_level = "high"
-
         # Linear trend
         reg_x = np.arange(len(df))
         reg_y = df["value"]
@@ -51,26 +63,85 @@ class TrendAnalysis:
         slope = reg.slope
         r_squared = reg.rvalue ** 2
 
-        linear_trend_strength = "weak"
-        if r_squared >= .9:
-            linear_trend_strength = "very strong"
-        elif r_squared >= .75:
-            linear_trend_strength = "strong"
-        elif r_squared >= .5:
-            linear_trend_strength = "moderate"
-
         slope_direction = (
             "upward" if slope > 0
             else "downward" if slope < 0
             else "flat")
 
-        self.metrics = {
-            "slope_direction":slope_direction,
-            "linear_trend_strength":linear_trend_strength,
-            'volatility':volatility_level,
-            "total_percent_change_start_end": round(total_percent_change_start_end, 2),
-            "average_yoy_change": round(avg_yoy_change, 2),
-            "volatility":volatility}
+        # drawdown
+        rolling_max = df[y].cummax()
+        drawdown = ((df[y] - rolling_max)/ rolling_max)
+        max_drawdown = drawdown.min() * 100
+
+        # growth metrics
+        if self.data_loader.data_plan.series_ids == 'CPIAUCSL':
+            self.metrics={
+                    "average_yoy_change": round(avg_yoy_change, 2),
+                    "total_num_years":num_years,
+                    "total_cagr": round(cagr, 2),
+                    "recent_years_cagr":round(recent_years_cagr,2),
+                    "num_recent_years_tracked_for_cagr":num_recent_years,
+                    "growth_regime":growth_regime}
+            
+        elif self.data_loader.data_plan.series_ids == 'PAYEMS':
+            self.metrics= {
+                "total_num_years":num_years,
+                "total_cagr": round(cagr, 2),
+                "recent_years_cagr":round(recent_years_cagr,2),
+                "num_recent_years_tracked_for_cagr":num_recent_years,
+                "average_yoy_change": round(avg_yoy_change, 2),
+                "slope_direction":slope_direction,
+                "max_drawdown":max_drawdown}
+            
+        elif self.data_loader.data_plan.series_ids == 'GDP':       
+            self.metrics= {
+                "total_num_years":num_years,
+                "total_cagr": round(cagr, 2),
+                "recent_years_cagr":round(recent_years_cagr,2),
+                "num_recent_years_tracked_for_cagr":num_recent_years,
+                "average_yoy_change": round(avg_yoy_change, 2),
+                "r_squared":r_squared,
+                "max_drawdown":max_drawdown}
+        elif self.data_loader.data_plan.series_ids == 'M2SL':     
+            self.metrics= {
+                "recent_years_cagr":round(recent_years_cagr,2),
+                "total_cagr": round(cagr, 2),
+                "average_yoy_change": round(avg_yoy_change, 2),
+                "growth_regime":growth_regime}
+            
+        elif self.data_loader.data_plan.series_ids == 'SP500':     
+            self.metrics= {
+                "total_num_years":num_years,
+                "total_cagr": round(cagr, 2),
+                "recent_years_cagr":round(recent_years_cagr,2),
+                "num_recent_years_tracked_for_cagr":num_recent_years,
+                "max_drawdown":max_drawdown,
+                "volatility":volatility,
+                "slope_direction":slope_direction}
+            
+    # rate metrics
+        elif self.data_loader.data_plan.series_ids == 'FEDFUNDS':
+            self.metrics= {
+                "total_percent_change_start_end": round(total_percent_change_start_end, 2),
+                "slope":slope,
+                "slope_direction":slope_direction,      
+                "volatility":volatility,
+                "growth_regime":growth_regime}
+        
+        elif self.data_loader.data_plan.series_ids == 'DGS10':
+            self.metrics= {
+                "slope":slope,
+                "slope_direction":slope_direction,  
+                "volatility":volatility,
+                "max_drawdown":max_drawdown
+            }
+        elif self.data_loader.data_plan.series_ids == 'UNRATE':
+            self.metrics= {
+                "slope_direction":slope_direction,
+                "total_percent_change_start_end": round(total_percent_change_start_end, 2),
+                "volatility":volatility,
+                "max_drawdown":max_drawdown
+            }
 
         self.trends_df = (
             df.groupby("YEAR")
