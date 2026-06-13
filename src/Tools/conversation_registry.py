@@ -118,20 +118,14 @@ def explain_series_route(user_input,session_state=None):
                         "intent":None}
     }
 
-# #all other metadata inquiries ----------------------------------
+# # --- METADATA INQUIRY: properties of series ---
 # @register_conversation(
 #     "metadata_inquiry",
-#     description="""Use for metadata questions not covered by available_data or explain_series.
-#     This includes questions about units, frequency, seasonal adjustment, observation ranges, metadata fields,
-#     or comparisons of metadata across available FRED series.""",
+#     description="Questions about series METADATA not covered by available_data or explain_series: "
+#                 "units, frequency, seasonal adjustment, observation range, or metadata comparisons.",
 #     input_schema={
 #         "type": "object",
-#         "properties": {
-#             "user_input": {
-#                 "type": "string",
-#                 "description": "The user's most recent metadata or dataset availability question."
-#             }
-#         },
+#         "properties": {"user_input": {"type": "string"}},
 #         "required": ["user_input"]
 #     }
 # )
@@ -146,19 +140,15 @@ def explain_series_route(user_input,session_state=None):
 #                         "intent":None}
 #     }
 
-#follow up from previous Q ----------------------------
+# --- ANALYTICS FOLLOWUP: rerun/modify prior analysis ---
 @register_conversation(
     "analytics_followup",
-    description="""The user wants to rerun or modify a previous analytics workflow while preserving prior analytical context such as analysis type, ranking structure, timeframe, grouping, or compared series.
-    for examples now do CPI,what about unemployment,make it monthly,top 10 instead, use GDP""",
+    description="Rerun or MODIFY the previous analysis, reusing prior context "
+                "(analysis type, ranking, timeframe, grouping, series). "
+                "E.g. 'now do CPI', 'make it monthly', 'top 10 instead', 'what about unemployment'.",
     input_schema={
         "type": "object",
-        "properties": {
-            "user_input": {
-                "type": "string",
-                "description": "The user's most recent message."
-            }
-        },
+        "properties": {"user_input": {"type": "string"}},
         "required": ["user_input"]
     }
 )
@@ -167,19 +157,14 @@ def analytics_followup_route(user_input, session_state=None):
     expanded_user_input=run_followup(chat_history,user_input)
     return analytic_route(expanded_user_input) #TO-DO make sure to save the enriched user input not the raw input
 
-#clarify the previous chat bot response -------------------
+# --- RESULT CLARIFICATION: explain prior result, no rerun ---
 @register_conversation(
     "result_clarification",
-    description="""The user wants explanation, interpretation, clarification, expansion, or summarization of a previous analytical result without rerunning the workflow.
-    - examples: explain this correlation, what does this mean?, summarize the chart, why was spearman used?""",
+    description="Explain, interpret, or summarize a PREVIOUS result WITHOUT rerunning it. "
+                "E.g. 'what does this mean?', 'explain this correlation', 'why use spearman?'.",
     input_schema={
         "type": "object",
-        "properties": {
-            "user_input": {
-                "type": "string",
-                "description": "The user's most recent message."
-            }
-        },
+        "properties": {"user_input": {"type": "string"}},
         "required": ["user_input"]
     }
 )
@@ -197,19 +182,13 @@ def result_clarification_route(user_input,session_state=None):
                         "intent":None}
     }
 
-##new route
-# note: FRED is a free, publicly accessible data for research --------------------------
+# --- DATA SOURCE: provenance ---
 @register_conversation(
     "data_source",
-    description="""the user wants to know where the FRED data that is being used originates from.""",
+    description="User asks where the FRED data comes from / its origin or source.",
     input_schema={
         "type": "object",
-        "properties": {
-            "user_input": {
-                "type": "string",
-                "description": "The user's most recent message."
-            }
-        },
+        "properties": {"user_input": {"type": "string"}},
         "required": ["user_input"]
     }
 )
@@ -226,21 +205,38 @@ API docs: https://fred.stlouisfed.org/docs/api/fred/overview.html"""
                         "intent":None}}
 
 
-#new route that will show a preview of the data in the database-------------------------
+# # --- DATA PREVIEW: structure/sample ---
+# @register_conversation(
+#     "data_preview",
+#     description="User wants to INSPECT a dataset's STRUCTURE: sample rows, first rows, "
+#                 "column names, or data types. Returns the first 5 rows. "
+#                 "Use for 'show me what the data looks like', not for specific values.",
+#     input_schema={
+#         "type": "object",
+#         "properties": {"user_input": {"type": "string"}},
+#         "required": ["user_input"]
+#     }
+# )
+# def data_preview_route(user_input,session_state=None):
+#     top_results=[]
+#     inferred_series_intent = run_series_intent_prompt(user_input)
+#     top_results.extend(inferred_series_intent.split(','))
+#     print(top_results)
+#     # fred_metadata = session_state.fred_metadata
+#     # fred_metadata=fred_metadata[fred_metadata['series_id'].isin(top_results)]
+
+#     preview_df=get_table_preview(series_ids=top_results)
+#     return {
+#         "summary": "",
+#         "chart_path": None,
+#         "table": preview_df,
+#         "data_plan": {"route": "data_preview",
+#                         "intent":None}}
+
+#show data in the database-------------------------
 @register_conversation(
-    "data_preview",
-    description="""user wants to see a preview of the data available in the database. The user wants to view actual rows from the database/dataset.
-
-Call this when the user asks to:
-- show a sample of the data
-- show example data
-- preview the data
-- show the first rows
-- show the table structure
-- inspect columns
-- see what the dataset looks like
-
-this will provide the first 5 rows of the requests dataset for the user to quickly inspect the structure, column names, and data types of the data.""",
+    "data_query",
+    description="Return actual data VALUES in a table: latest/current value, values by year/month/quarter, or filtered/grouped rows (where, group by). Use for raw observations, NOT for computed analysis.",
     input_schema={
         "type": "object",
         "properties": {
@@ -252,28 +248,19 @@ this will provide the first 5 rows of the requests dataset for the user to quick
         "required": ["user_input"]
     }
 )
-def data_preview_route(user_input,session_state=None):
-    top_results=[]
-    inferred_series_intent = run_series_intent_prompt(user_input)
-    top_results.extend(inferred_series_intent.split(','))
-    print(top_results)
-    # fred_metadata = session_state.fred_metadata
-    # fred_metadata=fred_metadata[fred_metadata['series_id'].isin(top_results)]
-
-    preview_df=get_table_preview(series_ids=top_results)
+def data_query_route(user_input,session_state=None):
+    df=orcestrator.run_query_agent(user_input)
     return {
         "summary": "",
         "chart_path": None,
-        "table": preview_df,
-        "data_plan": {"route": "data_preview",
+        "table": df,
+        "data_plan": {"route": "data_query",
                         "intent":None}}
-
 
 #not supported --------------------------
 @register_conversation(
     "unsupported",
-    description="""user is truly out of scope, unrelated, ambiguous, or cannot reasonably reference prior analytical context.""",
-    input_schema={
+description="Fallback for requests that are out of scope, unrelated to FRED data, or too ambiguous to route. Use only when no other tool fits.",    input_schema={
         "type": "object",
         "properties": {
             "user_input": {
