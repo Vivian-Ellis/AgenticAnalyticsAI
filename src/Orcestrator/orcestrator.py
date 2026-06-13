@@ -13,6 +13,9 @@ from Orcestrator.AgentResponse import AgentResponse
 from Orcestrator.agent_validation import AgentValidator
 import Narration.summaries as summaries
 
+from datetime import datetime
+import time
+
 def run_analytics_agent(question,chat_history=None):
     chat_history = chat_history or []
 
@@ -34,6 +37,36 @@ def run_analytics_agent(question,chat_history=None):
     chart_path = chart.run()
 
     return AgentResponse(question, result, chart_path, data_plan, tool)
+
+def run_query_agent(question,chat_history=None):
+    chat_history = chat_history or []
+
+    start_time = datetime.now()
+    data_plan=ClaudeDataPlanBuilder(question).run()
+    end_time = datetime.now()
+    duration = end_time - start_time
+    print(f"ClaudeDataPlanBuilder Duration:   {duration}")
+
+    start_time = datetime.now()
+    AgentValidator.validate_query_plan(data_plan)
+    end_time = datetime.now()
+    duration = end_time - start_time
+    print(f"validate_query_plan Duration:   {duration}")
+
+    start_time = datetime.now()
+    data_loader = DataLoader(data_plan)
+    df=data_loader.run()
+    end_time = datetime.now()
+    duration = end_time - start_time
+    print(f"DataLoader Duration:   {duration}")
+
+    start_time = datetime.now()
+    AgentValidator.validate_data(data_loader)
+    end_time = datetime.now()
+    duration = end_time - start_time
+    print(f"validate_data Duration:   {duration}")
+
+    return df
 
 def run_general_agent(question,metadata,chat_history=None):
     return summaries.run_general_assistant(question,metadata,chat_history)

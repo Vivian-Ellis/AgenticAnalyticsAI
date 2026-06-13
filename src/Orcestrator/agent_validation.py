@@ -166,3 +166,32 @@ class AgentValidator:
                     f"{result.intent} result is missing required attribute: {attr}")
 
         return True
+    
+    @staticmethod
+    def validate_query_plan(data_plan):
+        """
+        Validate the DataPlanBuilder output before loading data.
+        """
+        if data_plan is None:
+            raise ValueError("Data plan is None.")
+        if not data_plan.question:
+            raise ValueError("Data plan is missing the original question.")
+        # if data_plan.question_intent not in AgentValidator.VALID_INTENTS:
+        #     raise ValueError(
+        #         f"Unsupported question intent: {data_plan.question_intent}. "
+        #         f"Expected one of {AgentValidator.VALID_INTENTS}.")
+        if not data_plan.series_ids:
+            raise ValueError("Data plan did not identify any series_ids.")
+        if not isinstance(data_plan.series_ids, list):
+            raise TypeError("data_plan.series_ids must be a list.")
+        if data_plan.date_grain not in AgentValidator.VALID_DATE_GRAINS:
+            raise ValueError(
+                f"Invalid date_grain: {data_plan.date_grain}. "
+                f"Expected one of {AgentValidator.VALID_DATE_GRAINS}.")
+        if not data_plan.start_date or not data_plan.end_date:
+            raise ValueError("Data plan must include both start_date and end_date.")
+        if data_plan.start_date > data_plan.end_date:
+            raise ValueError(
+                f"Invalid date range: start_date {data_plan.start_date} "
+                f"is after end_date {data_plan.end_date}.")
+        return True
