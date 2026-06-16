@@ -26,11 +26,7 @@ st.session_state.fred_metadata = load_metadata()[["series_id","title","frequency
 markdown_style = Path("appmarkdownstyle.txt").read_text()
 
 #sytling and helpful info for newbies
-HELP_MESSAGE = """
-### Need Help?
-I'm here to provide statistical analysis of Federal Reserve Economic Data (FRED). 
-
-### What to ask?
+HELP_MESSAGE = """I'm here to provide statistical analysis of Federal Reserve Economic Data (FRED). 
 
 **📈 Trends**
 - How has payroll employment changed over time?
@@ -41,7 +37,6 @@ I'm here to provide statistical analysis of Federal Reserve Economic Data (FRED)
 - Lowest GDP quarters over the past 10 years.
 
 **⚖️ Comparisons**
-- Compare federal funds rates before and after 2020.
 - Compare median employment levels before and after COVID.
 - Compare unemployment volatility between 2024 and 2025.
 
@@ -63,7 +58,7 @@ I'm here to provide statistical analysis of Federal Reserve Economic Data (FRED)
 - Explain the p-value.
 """
 
-col1, col2 = st.columns([4, 1])
+col1, col2 = st.columns([5, 1])
 
 # with col1:
 #     st.write("### FRED Analytics AI Agent")

@@ -21,7 +21,7 @@ class TrendAnalysis:
 
         # STEP 1 understand dataset semantics
         self.series_semantics=semantics.dataset_ranking_semantics(self.data_loader.data_plan.series_ids)
-
+        date_grain=self.data_loader.data_plan.date_grain
         # STEP 2 METRICS -----------------------
         y='value'
         x='date'
@@ -33,12 +33,15 @@ class TrendAnalysis:
         total_percent_change_start_end = ((df[y].iloc[-1] - df[y].iloc[0]) / df[y].iloc[0]) * 100
 
         # CAGR (Annualized growth rate)
-        num_years = df.year.nunique()
+        num_years = df[date_grain].nunique()
         cagr = ((df[y].iloc[-1] / df[y].iloc[0]) ** (1 / num_years) - 1) * 100
 
         # CAGR (Annualized growth rate for recent years)
         num_recent_years=round(num_years*.1)
-        recent_years=df[df['year']>=(df['year'].max()-num_recent_years)]
+        if num_recent_years<1:
+            num_recent_years=1
+
+        recent_years=df[df[date_grain]>=(df[date_grain].max()-num_recent_years)]
         recent_years_cagr = ((recent_years['value'].iloc[-1] / recent_years['value'].iloc[0]) ** (1 / num_recent_years) - 1) * 100
 
         growth_regime = (
@@ -61,7 +64,6 @@ class TrendAnalysis:
         reg_y = df["value"]
         reg = linregress(reg_x, reg_y)
         slope = reg.slope
-        r_squared = reg.rvalue ** 2
 
         slope_direction = (
             "upward" if slope > 0
@@ -93,15 +95,27 @@ class TrendAnalysis:
                 "slope_direction":slope_direction,
                 "max_drawdown":max_drawdown}
             
-        elif self.data_loader.data_plan.series_ids == 'GDP':       
+        elif self.data_loader.data_plan.series_ids == 'GDP':  
+            r_squared = reg.rvalue ** 2
+
+            linear_trend_strength = "weak"
+            if r_squared >= .9:
+                linear_trend_strength = "very strong"
+            elif r_squared >= .75:
+                linear_trend_strength = "strong"
+            elif r_squared >= .5:
+                linear_trend_strength = "moderate"    
+
             self.metrics= {
                 "total_num_years":num_years,
                 "total_cagr": round(cagr, 2),
                 "recent_years_cagr":round(recent_years_cagr,2),
                 "num_recent_years_tracked_for_cagr":num_recent_years,
                 "average_yoy_change": round(avg_yoy_change, 2),
-                "r_squared":r_squared,
+                # "r_squared":r_squared,
+                "trend_strength":linear_trend_strength,
                 "max_drawdown":max_drawdown}
+            
         elif self.data_loader.data_plan.series_ids == 'M2SL':     
             self.metrics= {
                 "recent_years_cagr":round(recent_years_cagr,2),

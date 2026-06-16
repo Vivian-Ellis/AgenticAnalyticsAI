@@ -143,6 +143,13 @@ def build_timeframe_prompt(question,todays_date,aggregation_period):
                                  question=question)
     return prompt
 
+def build_timeframe_comparison_prompt(question,todays_date):
+    with open(PROMPTS_DIR / "comparison_timeframe_prompt.txt") as f:
+        template = f.read()  
+        prompt = template.format(todays_date=todays_date,
+                                 question=question)
+    return prompt
+
 def timeframe_validation_failed_prompt(question,prev_date_range):
     with open(PROMPTS_DIR / "timeframe_validation_failed_prompt.txt") as f:
         template = f.read()  
@@ -170,7 +177,7 @@ def build_metadata_prompt(user_input, fred_metadata):
         prompt = template.format(fred_metadata=fred_metadata,user_input=user_input)
     return prompt
 
-def run_prompt(prompt,max_tokens=500,model="claude-opus-4-8"):
+def run_prompt(prompt,max_tokens=1500,model="claude-opus-4-8"):
     message = client.messages.create(
         # model="claude-haiku-4-5-20251001",
         model=model,

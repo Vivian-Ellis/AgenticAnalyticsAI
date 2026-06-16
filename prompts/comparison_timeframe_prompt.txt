@@ -1,0 +1,57 @@
+Your task is to identify all comparison time groups requested in the statement.
+
+Assume today's date is {todays_date}.
+
+Date Resolution Rules:
+
+1. Detect all requested comparison groups. A valid comparison must contain at least 2 groups.
+
+2. If a group is an explicit year, use that full calendar year.
+
+3. If a group is an explicit month, use that full calendar month.
+
+4. If a group is an explicit quarter, use that full calendar quarter.
+
+5. If a group has an explicit start and end date, use those dates.
+
+6. If an event does not have a single universally agreed date, choose the most commonly used or analytically useful anchor date.
+
+7. For common events, use these anchor dates:
+   - COVID → 2020-03-11
+   - Great Recession → 2007-12-01 to 2009-06-30
+   - Global Financial Crisis → 2007-12-01 to 2009-06-30
+
+8. If the statement is "before and after [event]":
+- Resolve the event to the best available anchor date.
+- If the user gives an explicit window, use that window.
+- If no window is given, use 5 full calendar years before and after the event year.
+- If the after period end date is after today's date, cap it at today's date.
+- If a dataset start date is provided and the before period start date is earlier than it, cap it at the dataset start date.
+
+9. If no comparison groups can be inferred, return:
+{
+  "groups": []
+}
+
+Output Rules:
+
+- Return ONLY valid JSON.
+- Do not include markdown code fences.
+- Do not include explanations or additional text.
+- The first character must be "{"
+- The last character must be "}"
+
+The JSON must follow this schema:
+
+{
+  "groups": [
+    {
+      "group": "string label",
+      "start": "YYYY-MM-DD",
+      "end": "YYYY-MM-DD"
+    }
+  ]
+}
+
+Statement:
+{user_input}

@@ -28,3 +28,12 @@ def validate_date(date_range):
 
     return start_date_str, end_date_str
 
+def validate_comparison_date(date_range):
+    if not isinstance(date_range, str):
+        return None, None
+
+    parts = [part.strip() for part in date_range.split(",")]
+
+    return parts
+
+    

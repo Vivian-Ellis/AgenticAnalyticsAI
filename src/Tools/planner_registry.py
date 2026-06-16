@@ -204,7 +204,13 @@ def build_entire_data_plan(question):
     question_intent = predict_analytical_intent(question)
     series_ids = predict_series_intent(question)
     date_grain = date_aggregation_grain_intent(question)
-    start_date, end_date = timeline_intent(question, date_grain)
+
+    # comparison needs two time periods
+    if question_intent=="comparison":
+        start_date, end_date = timeline_intent(question, date_grain)
+    else:
+        start_date, end_date = timeline_intent(question, date_grain)
+
     dataset_context=summaries.build_context(series_ids)
 
     return {
@@ -215,3 +221,31 @@ def build_entire_data_plan(question):
         "end_date": end_date,
         "dataset_context":dataset_context
     }
+
+
+def timeline_comparison_intent(question,date_grain):
+    """
+    this function uses claude LLM to determine a date range for the user question
+
+    this function also performs validation of the LLM results and if validation fails the 
+    LLM will attempt to extract the date again. If the LLM cannot find a vlaid date we will
+    use "2016-01-01" thru last time FRED data was updated
+    
+    returns a start and end date in the format YYYY-MM-DD to be used to filter a df down
+    """
+    metadata=db.run_query("SELECT max(observation_end) as last_observation_date FROM clean_fred_metadata")
+    last_observation_date=metadata['last_observation_date'][0]
+    prompt=summaries.build_timeframe_comparison_prompt(question,last_observation_date,date_grain)
+    date_range= summaries.run_prompt(prompt)
+    #validate the dates
+    start_date, end_date = date_parser.validate_comparison_date(date_range)
+
+    if start_date is None or end_date is None:
+        new_date_range = timeline_intent_failed(question, date_range)
+        start_date, end_date = date_parser.validate_comparison_date(new_date_range)
+
+        if start_date is None or end_date is None:
+            start_date = "2016-01-01"
+            end_date = last_observation_date
+
+    return start_date, end_date
