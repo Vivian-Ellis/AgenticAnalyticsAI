@@ -26,36 +26,36 @@ st.session_state.fred_metadata = load_metadata()[["series_id","title","frequency
 markdown_style = Path("appmarkdownstyle.txt").read_text()
 
 #sytling and helpful info for newbies
-HELP_MESSAGE = """I'm here to provide statistical analysis of Federal Reserve Economic Data (FRED). 
+HELP_MESSAGE ="""I analyze economic data from the Federal Reserve Economic Data (FRED) database and can help you explore trends, rankings, comparisons, correlations, and statistical relationships across economic indicators.
 
-**📈 Trends**
+**📊 Analytical Questions**
 - How has payroll employment changed over time?
-- When did inflation begin accelerating?
+- What were the lowest GDP quarters in the past 10 years?
+- Compare employment levels before and after COVID.
+- How strongly are GDP and employment correlated?
 
-**🏆 Rankings**
-- Top 5 unemployment years
-- Lowest GDP quarters over the past 10 years.
-
-**⚖️ Comparisons**
-- Compare median employment levels before and after COVID.
-- Compare unemployment volatility between 2024 and 2025.
-
-**🔗 Correlations**
-- Is there a relationship between interest rates and unemployment?
-- How strongly are GDP and employment levels correlated?
-
-**📚 Metadata**
+**📚 Metadata & Definitions**
 - What datasets are available?
 - What does CPI mean?
+- What is the source of this data?
 
-**🔄 Follow-ups**
-- Now do GDP
-- Make it monthly
-- Bottom 6 instead
+**🔄 Follow-Up Requests**
+- Now do GDP.
+- Make it monthly.
+- Bottom 6 instead.
+- Compare that to unemployment.
 
-**💡Clarifications**
-- Why did you use Spearman?
+**💡 Methodology & Clarifications**
+- Why did you use Spearman correlation?
 - Explain the p-value.
+- How was this comparison performed?
+
+You can ask follow-up questions at any time, and I'll use the context of our conversation to refine or extend the analysis.
+
+Data Source: Federal Reserve Economic Data (FRED), Federal Reserve Bank of St. Louis.
+
+**Source Code:**
+[AgenticAnalyticsAI GitHub Repository ↗](https://github.com/Vivian-Ellis/AgenticAnalyticsAI)
 """
 
 col1, col2 = st.columns([5, 1])
