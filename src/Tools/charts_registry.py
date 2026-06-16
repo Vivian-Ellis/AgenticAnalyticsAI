@@ -10,6 +10,7 @@ from bokeh.plotting import figure, column,output_file, save,ColumnDataSource
 from bokeh.models import NumeralTickFormatter
 from bokeh.models.tools import HoverTool
 import json
+import numpy as np
 
 CHARTS_DIR = Path(__file__).resolve().parents[2] / "chart_files"
 CHARTS_DIR.mkdir(parents=True, exist_ok=True) #if not exist create
@@ -40,12 +41,20 @@ class Chart:
     description="Standard sorted bar chart",
     output_type="file_path")
 def build_ranking_chart(results):
-    chart_df = results.ranked_df.copy()
+    chart_df = results.original_df.copy()
+    chart_df["is_color"] = chart_df["Value"].isin(results.ranked_df["Value"])
+    chart_df["color"] = np.where(chart_df["is_color"],"#87a6d4","#d3d3d3")
+    print(chart_df)
+    print(results)
+    min_date_observation=chart_df[results.date_grain].min()
+    title=f"Ranking {results.series_ids[0]} Since {min_date_observation}"
+    chart_df.sort_values(results.date_grain)
     date_cleanup(chart_df)
     return Bar(
         chart_df[results.date_grain],
         chart_df["Value"],
-        "Ranking Chart")
+        title,
+        chart_df["color"])
 
 @register_chart(
     "comparison_bar",
@@ -54,10 +63,12 @@ def build_ranking_chart(results):
 def build_comparison_chart(results):
     chart_df = results.descriptive_statistics.copy()
     date_cleanup(chart_df)
+    chart_df["color"] ="#87a6d4"
     return Bar(
         chart_df[results.date_grain],
         chart_df["Value"],
-        "Comparison Chart")
+        "Comparison Chart",
+        chart_df["color"])
 
 @register_chart(
     "correlation_scatter",
@@ -151,9 +162,10 @@ class TimeSeries:
         return full_trend_layout
 
 class Bar:
-    def __init__(self,x,y,title):
+    def __init__(self,x,y,title,colors):
         self.x=x
         self.y=y
+        self.colors = colors
         self.title=title
 
     def plot(self):
@@ -162,7 +174,8 @@ class Bar:
     
         table_source = ColumnDataSource(data=dict(
             x=x_values,
-            y=y_values))
+            y=y_values,
+            color=self.colors))
 
         table_fig = figure(
             x_range=x_values,
@@ -180,7 +193,7 @@ class Bar:
             top="y",
             source=table_source,
             width=0.85,
-            color="#87a6d4")
+            color="color")
 
         # title
         table_fig.title.align = "center"

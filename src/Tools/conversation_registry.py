@@ -19,9 +19,9 @@ from DataBase.db import get_table_preview
 #main analytics route---------------------
 @register_conversation(
     "analytics",
-    description="""Use this when the user is asking for a data analysis, statistical analysis, 
-    ranking, comparison, correlation, trend analysis, time-based analysis, chart, or 
-    quantitative answer using FRED economic data.""",
+    description="""Use for new FRED questions that require computation or interpretation, including:
+comparisons, trends, rankings, correlations, charts, statistical summaries, or higher/lower questions.
+Examples: compare inflation in 2024 vs 2025; top 5 unemployment months; when did inflation accelerate?""",
     input_schema={
         "type": "object",
         "properties": {
@@ -43,40 +43,21 @@ def analytic_route(user_input,session_state=None):
                         "intent":agentresponse.response["data_plan"]["intent"]}
     }
 
-#simple greeting -----------------------
-@register_conversation(
-    "greeting",
-    description="""Use this for simple greetings like hi, hello, hey, or when the user is casually starting the chat.""",
-    input_schema={
-        "type": "object",
-        "properties": {},
-        "required": []
-    }
-)
-def greeting_route(session_state=None):
-    return {
-        "summary": "Hi, I'm ready to answer questions about FRED data.",
-        "chart_path": None,
-        "table": None,
-        "data_plan": {"route": "greeting",
-                        "intent":None}
-    }
-
-#what datasets we have --------------------------------
-@register_conversation(
-    "available_data",
-    description="""Use this when the user asks about available FRED datasets.""",
-    input_schema={
-        "type": "object",
-        "properties": {
-            "user_input": {
-                "type": "string",
-                "description": "The user's most recent metadata or dataset availability question."
-            }
-        },
-        "required": ["user_input"]
-    }
-)
+# #what datasets we have --------------------------------
+# @register_conversation(
+#     "available_data",
+#     description="""Use this when the user asks about available FRED datasets.""",
+#     input_schema={
+#         "type": "object",
+#         "properties": {
+#             "user_input": {
+#                 "type": "string",
+#                 "description": "The user's most recent metadata or dataset availability question."
+#             }
+#         },
+#         "required": ["user_input"]
+#     }
+# )
 def available_data_inquiry_route(user_input,session_state=None):
     fred_metadata = session_state.fred_metadata[["series_id","title","frequency","seasonal_adjustment","observation_start","observation_end"]]
     return {
@@ -86,57 +67,54 @@ def available_data_inquiry_route(user_input,session_state=None):
         "data_plan": {"route": "available_data", "intent": None}
     }
 
-# clarify what the series means---------------------------------
-@register_conversation(
-    "explain_series",
-    description="""Use when the user asks what a specific FRED series, series ID, dataset, or economic indicator means.""",
-    input_schema={
-        "type": "object",
-        "properties": {
-            "user_input": {
-                "type": "string",
-                "description": "The user's most recent metadata or dataset availability question."
-            }
-        },
-        "required": ["user_input"]
-    }
-)
-def explain_series_route(user_input,session_state=None):
-    top_results=[]
-    inferred_series_intent = run_series_intent_prompt(user_input)
-    top_results.extend(inferred_series_intent.split(','))
-    print(top_results)
-    fred_metadata = session_state.fred_metadata
-    fred_metadata=fred_metadata[fred_metadata['series_id'].isin(top_results)]
-
-    message=f"**{fred_metadata['updated_title'].iloc[0]}**\n\n{fred_metadata['description'].iloc[0]}"
-    return {
-        "summary": message,
-        "chart_path": None,
-        "table": None,
-        "data_plan": {"route": "explain_series",
-                        "intent":None}
-    }
-
-# # --- METADATA INQUIRY: properties of series ---
+# # clarify what the series means---------------------------------
 # @register_conversation(
-#     "metadata_inquiry",
-#     description="Questions about series METADATA not covered by available_data or explain_series: "
-#                 "units, frequency, seasonal adjustment, observation range, or metadata comparisons.",
+#     "explain_series",
+#     description="""Use when the user asks what a specific FRED series, series ID, dataset, or economic indicator means.""",
+#     input_schema={
+#         "type": "object",
+#         "properties": {
+#             "user_input": {
+#                 "type": "string",
+#                 "description": "The user's most recent metadata or dataset availability question."
+#             }
+#         },
+#         "required": ["user_input"]
+#     }
+# )
+# def explain_series_route(user_input,session_state=None):
+#     top_results=[]
+#     inferred_series_intent = run_series_intent_prompt(user_input)
+#     top_results.extend(inferred_series_intent.split(','))
+#     print(top_results)
+#     fred_metadata = session_state.fred_metadata
+#     fred_metadata=fred_metadata[fred_metadata['series_id'].isin(top_results)]
+
+#     message=f"**{fred_metadata['updated_title'].iloc[0]}**\n\n{fred_metadata['description'].iloc[0]}"
+#     return {
+#         "summary": message,
+#         "chart_path": None,
+#         "table": None,
+#         "data_plan": {"route": "explain_series",
+#                         "intent":None}
+#     }
+
+# # --- ANALYTICS FOLLOWUP: rerun/modify prior analysis && RESULT CLARIFICATION: explain prior result, no rerun---
+# @register_conversation(
+#     "followup",
+#     description="""Use when the user refers to a previous analysis or result, either to modify/rerun it or to ask for clarification, explanation, or interpretation.""",
 #     input_schema={
 #         "type": "object",
 #         "properties": {"user_input": {"type": "string"}},
 #         "required": ["user_input"]
 #     }
 # )
-# def metadata_inquiry_route(user_input,session_state=None):
-#     fred_metadata = session_state.fred_metadata.to_markdown(index=False)
-#     response = run_metadata_assistant(user_input, fred_metadata)
+# def followup_route(user_input, session_state=None):
 #     return {
-#         "summary": clean_llm_markdown(response),
+#         "summary": "underconstruction",
 #         "chart_path": None,
 #         "table": None,
-#         "data_plan": {"route": "metadata_inquiry",
+#         "data_plan": {"route": "followup",
 #                         "intent":None}
 #     }
 
@@ -182,16 +160,16 @@ def result_clarification_route(user_input,session_state=None):
                         "intent":None}
     }
 
-# --- DATA SOURCE: provenance ---
-@register_conversation(
-    "data_source",
-    description="User asks where the FRED data comes from / its origin or source.",
-    input_schema={
-        "type": "object",
-        "properties": {"user_input": {"type": "string"}},
-        "required": ["user_input"]
-    }
-)
+# # --- DATA SOURCE: provenance ---
+# @register_conversation(
+#     "data_source",
+#     description="User asks where the FRED data comes from / its origin or source.",
+#     input_schema={
+#         "type": "object",
+#         "properties": {"user_input": {"type": "string"}},
+#         "required": ["user_input"]
+#     }
+# )
 def data_source_route(user_input,session_state=None):
     message="""The data used in this AI agent comes from the Federal Reserve Economic Data (FRED) API, provided by the Federal Reserve Bank of St. Louis.
 
@@ -203,35 +181,6 @@ API docs: https://fred.stlouisfed.org/docs/api/fred/overview.html"""
         "table": None,
         "data_plan": {"route": "data_source",
                         "intent":None}}
-
-
-# # --- DATA PREVIEW: structure/sample ---
-# @register_conversation(
-#     "data_preview",
-#     description="User wants to INSPECT a dataset's STRUCTURE: sample rows, first rows, "
-#                 "column names, or data types. Returns the first 5 rows. "
-#                 "Use for 'show me what the data looks like', not for specific values.",
-#     input_schema={
-#         "type": "object",
-#         "properties": {"user_input": {"type": "string"}},
-#         "required": ["user_input"]
-#     }
-# )
-# def data_preview_route(user_input,session_state=None):
-#     top_results=[]
-#     inferred_series_intent = run_series_intent_prompt(user_input)
-#     top_results.extend(inferred_series_intent.split(','))
-#     print(top_results)
-#     # fred_metadata = session_state.fred_metadata
-#     # fred_metadata=fred_metadata[fred_metadata['series_id'].isin(top_results)]
-
-#     preview_df=get_table_preview(series_ids=top_results)
-#     return {
-#         "summary": "",
-#         "chart_path": None,
-#         "table": preview_df,
-#         "data_plan": {"route": "data_preview",
-#                         "intent":None}}
 
 #show data in the database-------------------------
 @register_conversation(
@@ -259,8 +208,9 @@ def data_query_route(user_input,session_state=None):
 
 #not supported --------------------------
 @register_conversation(
-    "unsupported",
-description="Fallback for requests that are out of scope, unrelated to FRED data, or too ambiguous to route. Use only when no other tool fits.",    input_schema={
+    "general",
+description="Fallback for requests that are out of scope, unrelated to FRED data, or too ambiguous to route. Use only when no other tool fits.",    
+input_schema={
         "type": "object",
         "properties": {
             "user_input": {
@@ -271,49 +221,12 @@ description="Fallback for requests that are out of scope, unrelated to FRED data
         "required": ["user_input"]
     }
 )
-def unsupported_route(user_input,session_state=None):
+def general_route(user_input,session_state=None):
+    message="Your inquiry is not supported at this time."
+
     return {
-        "summary": "Your inquiry is not supported at this time.",
+        "summary": message,
         "chart_path": None,
         "table": None,
-        "data_plan": {"route": "unsupported",
+        "data_plan": {"route": "general",
                         "intent":None}}
-
-# #bot help for beginners who dont know how to use --------------------------
-# @register_conversation(
-#     "assistance_needed",
-#     description="""the user does not know how to use the ai agent and wants suggestions on what type of wuestions can be asked and the capabilities that the bot is capable of.""",
-#     input_schema={
-#         "type": "object",
-#         "properties": {
-#             "user_input": {
-#                 "type": "string",
-#                 "description": "The user's most recent message."
-#             }
-#         },
-#         "required": ["user_input"]
-#     }
-# )
-# def assistance_needed_route(user_input,session_state=None):
-#     message = """
-#     I provide statistical analysis of Federal Reserve Economic Data (FRED).
-
-#     Examples:
-#     - Top 5 unemployment years
-#     - Was inflation higher in 2022 than 2018?
-#     - Is there a relationship between interest rates and unemployment?
-
-#     I can also help explain available datasets and metadata.
-
-#     Follow-up questions are supported:
-#     - Now do GDP
-#     - Make it monthly
-#     - Top 10 instead
-#     - Why was that test used?"""
-
-#     return {
-#         "summary": message,
-#         "chart_path": None,
-#         "table": None,
-#         "data_plan": {"route": "assistance_needed",
-#                         "intent":None}}

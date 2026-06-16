@@ -177,7 +177,7 @@ def build_metadata_prompt(user_input, fred_metadata):
         prompt = template.format(fred_metadata=fred_metadata,user_input=user_input)
     return prompt
 
-def run_prompt(prompt,max_tokens=1500,model="claude-opus-4-8"):
+def run_prompt(prompt,max_tokens=1500,model="claude-haiku-4-5-20251001"):
     message = client.messages.create(
         # model="claude-haiku-4-5-20251001",
         model=model,
