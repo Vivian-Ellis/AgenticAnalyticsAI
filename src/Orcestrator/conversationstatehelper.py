@@ -37,7 +37,7 @@ DATA_SOURCE_PHRASES = {
 AVAILABLE_DATA_PHRASES = {
     "what data do you have","what datasets do you have","what fred data do you have","what fred datasets do you have",
     "available data","available datasets","show available data","show available datasets","list datasets","list available datasets",
-    "What are the available FRED datasets?"}
+    "What are the available fred datasets"}
 
 def normalize_input_text(text):
     text = text.lower().strip()      # lowercase + trim ends
