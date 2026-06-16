@@ -21,7 +21,7 @@ import time
 def load_metadata():
     return db.get_series_metadata()
 
-st.session_state.fred_metadata = load_metadata()[["series_id","title","frequency","observation_start","observation_end","description","updated_title"]]
+st.session_state.fred_metadata = load_metadata()[["series_id","title","frequency","observation_start","observation_end","description","updated_title","seasonal_adjustment"]]
 
 markdown_style = Path("appmarkdownstyle.txt").read_text()
 

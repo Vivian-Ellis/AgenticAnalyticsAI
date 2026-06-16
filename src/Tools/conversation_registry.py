@@ -59,6 +59,7 @@ def analytic_route(user_input,session_state=None):
 #     }
 # )
 def available_data_inquiry_route(user_input,session_state=None):
+    print(session_state.fred_metadata.head().to_string())
     fred_metadata = session_state.fred_metadata[["series_id","title","frequency","seasonal_adjustment","observation_start","observation_end"]]
     return {
         "summary": "**Available FRED datasets**",

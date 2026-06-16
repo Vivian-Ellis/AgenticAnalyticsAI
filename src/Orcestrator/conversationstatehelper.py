@@ -37,7 +37,7 @@ DATA_SOURCE_PHRASES = {
 AVAILABLE_DATA_PHRASES = {
     "what data do you have","what datasets do you have","what fred data do you have","what fred datasets do you have",
     "available data","available datasets","show available data","show available datasets","list datasets","list available datasets",
-    "What are the available fred datasets"}
+    "what are the available fred datasets","what datasets can i use","what datasets are there"}
 
 def normalize_input_text(text):
     text = text.lower().strip()      # lowercase + trim ends
@@ -116,6 +116,7 @@ def question_routing(user_input, session_state=None):
 # {user_input}"""
     #determanistic routing first
     user_input_text=normalize_input_text(user_input)
+    print(user_input_text)
     if user_input_text in GREETINGS: #general greetings
         result = {"summary":  "Hi, I'm ready to answer questions about FRED data.",
                     "chart_path": None,
