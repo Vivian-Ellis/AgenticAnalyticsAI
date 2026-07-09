@@ -72,7 +72,11 @@ def rank_periods(df, sort_by, n=10, ascending=False):
         ranked= df.sort_values(by=sort_by, ascending=ascending).head(abs(n))
     else:
         ranked= df.sort_values(by=sort_by, ascending=ascending)
-    return ranked.reset_index(drop=True)
+    ranked=ranked.reset_index(drop=True)
+    ranked.index = ranked.index + 1
+    ranked.index.name = "Rank"
+    ranked["Value"] = ranked["Value"].round(2)
+    return ranked
 
 def filter_df(df, field, value, operator=">="):
     if operator == ">=":

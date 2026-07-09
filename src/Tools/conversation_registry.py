@@ -33,15 +33,19 @@ Examples: compare inflation in 2024 vs 2025; top 5 unemployment months; when did
         "required": ["user_input"]
     }
 )
-def analytic_route(user_input,session_state=None):
+def analytic_route(user_input):
     agentresponse = orcestrator.run_analytics_agent(user_input)
-    return {
-        "summary": clean_llm_markdown(agentresponse.response['summary']),
-        "chart_path": agentresponse.response['chart_path'],
-        "table": agentresponse.response['table'],
-        "data_plan": {"route": "analytics",
-                        "intent":agentresponse.response["data_plan"]["intent"]}
-    }
+    if agentresponse is None:
+        return general_route(user_input,message="This analysis type is currently unsupported.")
+    else:
+        summary=clean_llm_markdown(agentresponse.response['summary'])
+        return {
+            "summary": summary,
+            "chart_path": agentresponse.response['chart_path'],
+            "table": agentresponse.response['table'],
+            "data_plan": {"route": "analytics",
+                            "intent":agentresponse.response["data_plan"]["intent"]}
+        }
 
 # #what datasets we have --------------------------------
 # @register_conversation(
@@ -59,7 +63,7 @@ def analytic_route(user_input,session_state=None):
 #     }
 # )
 def available_data_inquiry_route(user_input,session_state=None):
-    print(session_state.fred_metadata.head().to_string())
+    # print(session_state.fred_metadata.head().to_string())
     fred_metadata = session_state.fred_metadata[["series_id","title","frequency","seasonal_adjustment","observation_start","observation_end"]]
     return {
         "summary": "**Available FRED datasets**",
@@ -68,37 +72,36 @@ def available_data_inquiry_route(user_input,session_state=None):
         "data_plan": {"route": "available_data", "intent": None}
     }
 
-# # clarify what the series means---------------------------------
-# @register_conversation(
-#     "explain_series",
-#     description="""Use when the user asks what a specific FRED series, series ID, dataset, or economic indicator means.""",
-#     input_schema={
-#         "type": "object",
-#         "properties": {
-#             "user_input": {
-#                 "type": "string",
-#                 "description": "The user's most recent metadata or dataset availability question."
-#             }
-#         },
-#         "required": ["user_input"]
-#     }
-# )
-# def explain_series_route(user_input,session_state=None):
-#     top_results=[]
-#     inferred_series_intent = run_series_intent_prompt(user_input)
-#     top_results.extend(inferred_series_intent.split(','))
-#     print(top_results)
-#     fred_metadata = session_state.fred_metadata
-#     fred_metadata=fred_metadata[fred_metadata['series_id'].isin(top_results)]
+# clarify what the series means---------------------------------
+@register_conversation(
+    "explain_series",
+    description="""Use when the user asks what a specific FRED series, series ID, dataset, or economic indicator means.""",
+    input_schema={
+        "type": "object",
+        "properties": {
+            "user_input": {
+                "type": "string",
+                "description": "The user's most recent metadata or dataset availability question."
+            }
+        },
+        "required": ["user_input"]
+    }
+)
+def explain_series_route(user_input,session_state=None):
+    top_results=[]
+    inferred_series_intent = run_series_intent_prompt(user_input)
+    top_results.extend(inferred_series_intent.split(','))
+    fred_metadata = session_state.fred_metadata[["series_id","title","updated_title","description"]]
+    fred_metadata=fred_metadata[fred_metadata['series_id'].isin(top_results)]
 
-#     message=f"**{fred_metadata['updated_title'].iloc[0]}**\n\n{fred_metadata['description'].iloc[0]}"
-#     return {
-#         "summary": message,
-#         "chart_path": None,
-#         "table": None,
-#         "data_plan": {"route": "explain_series",
-#                         "intent":None}
-#     }
+    message=f"**{fred_metadata['updated_title'].iloc[0]}**\n\n{fred_metadata['description'].iloc[0]}"
+    return {
+        "summary": message,
+        "chart_path": None,
+        "table": None,
+        "data_plan": {"route": "explain_series",
+                        "intent":None}
+    }
 
 # # --- ANALYTICS FOLLOWUP: rerun/modify prior analysis && RESULT CLARIFICATION: explain prior result, no rerun---
 # @register_conversation(
@@ -123,8 +126,10 @@ def available_data_inquiry_route(user_input,session_state=None):
 @register_conversation(
     "analytics_followup",
     description="Rerun or MODIFY the previous analysis, reusing prior context "
+                "Use when the user's request depends on prior conversation context because "
+                "the question is incomplete or contains unresolved references."
                 "(analysis type, ranking, timeframe, grouping, series). "
-                "E.g. 'now do CPI', 'make it monthly', 'top 10 instead', 'what about unemployment'.",
+                "E.g. 'now do CPI', 'make it monthly', 'top 10 instead', 'what about unemployment','since 2000'",
     input_schema={
         "type": "object",
         "properties": {"user_input": {"type": "string"}},
@@ -171,7 +176,7 @@ def result_clarification_route(user_input,session_state=None):
 #         "required": ["user_input"]
 #     }
 # )
-def data_source_route(user_input,session_state=None):
+def data_source_route(user_input):
     message="""The data used in this AI agent comes from the Federal Reserve Economic Data (FRED) API, provided by the Federal Reserve Bank of St. Louis.
 
 API docs: https://fred.stlouisfed.org/docs/api/fred/overview.html"""
@@ -186,7 +191,7 @@ API docs: https://fred.stlouisfed.org/docs/api/fred/overview.html"""
 #show data in the database-------------------------
 @register_conversation(
     "data_query",
-    description="Return actual data VALUES in a table: latest/current value, values by year/month/quarter, or filtered/grouped rows (where, group by). Use for raw observations, NOT for computed analysis.",
+    description="Return actual data VALUES in a table: most recent, latest/current value, values by year/month/quarter, or filtered/grouped rows (where, group by). Use for raw observations, NOT for computed analysis. E.g. 'show me unemployment rates'",
     input_schema={
         "type": "object",
         "properties": {
@@ -198,7 +203,7 @@ API docs: https://fred.stlouisfed.org/docs/api/fred/overview.html"""
         "required": ["user_input"]
     }
 )
-def data_query_route(user_input,session_state=None):
+def data_query_route(user_input):
     df=orcestrator.run_query_agent(user_input)
     return {
         "summary": "",
@@ -222,9 +227,7 @@ input_schema={
         "required": ["user_input"]
     }
 )
-def general_route(user_input,session_state=None):
-    message="Your inquiry is not supported at this time."
-
+def general_route(user_input,message="Your inquiry is not supported at this time."):
     return {
         "summary": message,
         "chart_path": None,

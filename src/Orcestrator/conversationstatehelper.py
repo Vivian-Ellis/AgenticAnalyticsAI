@@ -3,13 +3,8 @@ from dotenv import load_dotenv
 import sys
 sys.path.append("../src/")
 import json
-
-from Tools.registries.conversation_tool_registry import list_anthropic_conversation_tools,get_conversation_tool
-from Tools import conversation_registry #need to import this because it populates the resigstry with all the tools in the script
-from Narration import summaries
-
+import inspect
 from datetime import datetime
-import time
 import re
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -23,6 +18,9 @@ sys.path.append(str(SRC_DIR))
 env_path = PROJECT_ROOT / ".env"
 load_dotenv(env_path, override=True)
 
+from Tools.registries.conversation_tool_registry import list_anthropic_conversation_tools,get_conversation_tool
+from Tools import conversation_registry #need to import this because it populates the resigstry with all the tools in the script
+from Narration import summaries
 CONVERSATION_TOOLS = list_anthropic_conversation_tools()
 
 GREETINGS = {"hi","hello","hey","howdy","sup","yo","hiya","greetings",
@@ -32,12 +30,14 @@ DATA_SOURCE_PHRASES = {
     "what does fred mean", "what does fred stand for","what is fred","link to the fred api","fred api",
     "fred api docs", "where was this data pulled","where was this data sourced", "where was the data pulled",
     "where was the data sourced", "where does the data come from","where is the data from","what is the data source", 
-    "what's the data source","what is the source", "what's the source","source of the data","is this from fred","is this fred data"}
+    "what's the data source","what is the source", "what's the source","source of the data","is this from fred","is this fred data",
+    "what is the source of this data"}
 
 AVAILABLE_DATA_PHRASES = {
     "what data do you have","what datasets do you have","what fred data do you have","what fred datasets do you have",
     "available data","available datasets","show available data","show available datasets","list datasets","list available datasets",
-    "what are the available fred datasets","what datasets can i use","what datasets are there"}
+    "what are the available fred datasets","what datasets can i use","what datasets are there","what are the available datasets",
+    "what datasets are available"}
 
 def normalize_input_text(text):
     text = text.lower().strip()      # lowercase + trim ends
@@ -58,15 +58,10 @@ def markdown_table_helper(table,analysis_type):
     if table is not None:
         if analysis_type=="ranking":
             table = table.copy()
-            table.index = table.index + 1
-            table.index.name = "Rank"
             # human readable dates
             date_cleanup(table)
             # format header
             table.columns = [col.replace("_", " ").title() for col in table.columns]
-            #round values
-            table["Value"] = table["Value"].round(2)
-            # display table to chat
             return table
         else:
             return table
@@ -125,8 +120,8 @@ def question_routing(user_input, session_state=None):
                                     "intent":None}
                 }
     elif user_input_text in DATA_SOURCE_PHRASES: #where i got the data
-        result = conversation_registry.data_source_route(user_input,session_state)
-    elif user_input_text in AVAILABLE_DATA_PHRASES: #what data is available to query or run analytics over
+        result = conversation_registry.data_source_route(user_input)
+    elif ("data" in user_input_text and "available" in user_input_text) or user_input_text in AVAILABLE_DATA_PHRASES: #what data is available to query or run analytics over
         result = conversation_registry.available_data_inquiry_route(user_input,session_state)
     else: # let Claude chooses to call the tool
         start_time = datetime.now()
@@ -141,7 +136,9 @@ def question_routing(user_input, session_state=None):
                 start_time = datetime.now()
                 tool = get_conversation_tool(block.name)
                 tool_input = dict(block.input)
-                tool_input["session_state"] = session_state
+                function_params = inspect.signature(tool["function"]).parameters
+                if "session_state" in function_params:
+                    tool_input["session_state"] = session_state
                 result = tool["function"](**tool_input)
                 end_time = datetime.now()
                 duration = end_time - start_time

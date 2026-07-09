@@ -18,7 +18,6 @@ class TrendAnalysis:
 
     def run_analysis(self):
         df=self.data_loader.data.copy()
-
         # STEP 1 understand dataset semantics
         self.series_semantics=semantics.dataset_ranking_semantics(self.data_loader.data_plan.series_ids)
         date_grain=self.data_loader.data_plan.date_grain
@@ -156,9 +155,9 @@ class TrendAnalysis:
                 "volatility":volatility,
                 "max_drawdown":max_drawdown
             }
-
+        
         self.trends_df = (
-            df.groupby("YEAR")
+            df.groupby(date_grain)
             .agg(avg_value=("value","mean")).reset_index())
 
         self.trends_df["annual_growth_pct"] = (

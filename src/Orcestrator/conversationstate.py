@@ -1,6 +1,10 @@
 import sys
 from pathlib import Path
 from dotenv import load_dotenv
+from conversationstatehelper import markdown_table_helper,question_routing
+import streamlit as st
+
+from datetime import datetime
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 SRC_DIR = PROJECT_ROOT / "src"
@@ -9,12 +13,6 @@ env_path = PROJECT_ROOT / ".env"
 load_dotenv(env_path, override=True)
 
 import DataBase.db as db
-import conversationstatehelper as helper
-import streamlit as st
-from streamlit_bokeh import streamlit_bokeh
-
-from datetime import datetime
-import time
 
 #pull the FRED metadata for available datasets
 @st.cache_data(show_spinner=False)
@@ -23,7 +21,11 @@ def load_metadata():
 
 st.session_state.fred_metadata = load_metadata()[["series_id","title","frequency","observation_start","observation_end","description","updated_title","seasonal_adjustment"]]
 
-markdown_style = Path("appmarkdownstyle.txt").read_text()
+#load in the stylings from file and save to cache
+@st.cache_data
+def load_css_style():
+    return Path("appmarkdownstyle.txt").read_text()
+markdown_style = load_css_style()
 
 #sytling and helpful info for newbies
 HELP_MESSAGE ="""I analyze economic data from the Federal Reserve Economic Data (FRED) database and can help you explore trends, rankings, comparisons, correlations, and statistical relationships across economic indicators.
@@ -31,7 +33,7 @@ HELP_MESSAGE ="""I analyze economic data from the Federal Reserve Economic Data 
 **📊 Analytical Questions**
 - How has payroll employment changed over time?
 - What were the lowest GDP quarters in the past 10 years?
-- Compare employment levels before and after COVID.
+- Compare employment levels in 2024 and 2025.
 - How strongly are GDP and employment correlated?
 
 **📚 Metadata & Definitions**
@@ -60,9 +62,6 @@ Data Source: Federal Reserve Economic Data (FRED), Federal Reserve Bank of St. L
 
 col1, col2 = st.columns([5, 1])
 
-# with col1:
-#     st.write("### FRED Analytics AI Agent")
-
 with col2:
     with st.popover("Help",icon="❔"):
         st.markdown(HELP_MESSAGE)
@@ -71,14 +70,15 @@ with col2:
 def markdown_table(table,analysis_type):
     #for rank
     if table is not None:
-        table=helper.markdown_table_helper(table,analysis_type)
+        table=markdown_table_helper(table,analysis_type)
         if analysis_type=="ranking":
-            st.dataframe(table,width="stretch")
+            st.dataframe(table,width="stretch",hide_index=True)
         else:
             st.dataframe(table,width='stretch',hide_index=True)
 
 def markdown_chart(chart):
     if chart:
+        from streamlit_bokeh import streamlit_bokeh
         streamlit_bokeh(chart)
 
 def render_assistant_message(msg):
@@ -88,10 +88,15 @@ def render_assistant_message(msg):
     intent = msg.get("data_plan", {}).get("intent")
     
     if intent == "ranking":
-        # prints all three respectively: ranked table, chart, and short summary
-        markdown_table(table, intent)
-        markdown_chart(chart)
+        # prints: ranked table
         st.markdown(content)
+        markdown_table(table.drop(columns=['Value']), intent)
+        # markdown_chart(chart)
+    elif intent == "correlation":
+        # prints: summary and scatter chart
+        st.markdown(content)
+        #markdown_table(table, intent)
+        markdown_chart(chart)
     else:
         # prints all three respectively: full summary, chart, and table
         st.markdown(content)
@@ -159,7 +164,7 @@ if user_input:
         with st.spinner("Analyzing..."):
             # Record time
             start_time = datetime.now()
-            result=helper.question_routing(user_input=user_input,session_state=st.session_state)
+            result=question_routing(user_input=user_input,session_state=st.session_state)
             end_time = datetime.now()
             duration = end_time - start_time
             print(f"Duration:   {duration}")

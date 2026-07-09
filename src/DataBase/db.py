@@ -49,17 +49,41 @@ def describe_table(table_name):
     return run_query(query)
 
 def get_series_metadata(series_id=None):
-    if series_id:
+    if isinstance(series_id, list): #if list
+        series_ids_sql = ",".join(f"'{s.strip()}'" for s in series_id) #convert from python list to sql list
         query = f"""
-        SELECT *
+        SELECT *,
+            CASE
+                WHEN units = 'Percent' THEN '%'
+                WHEN units = 'Index 1982-1984=100' THEN 'Index'
+                ELSE units
+            END AS new_units
+        FROM clean_fred_metadata
+        WHERE series_id in ({series_ids_sql})
+        ORDER BY series_id
+        """
+        return run_query(query)
+    elif type(series_id) is str: #if single value
+        query = f"""
+        SELECT *,
+            CASE
+                WHEN units = 'Percent' THEN '%'
+                WHEN units = 'Index 1982-1984=100' THEN 'Index'
+                ELSE units
+            END AS new_units
         FROM clean_fred_metadata
         WHERE series_id='{series_id}'
         ORDER BY series_id
         """
         return run_query(query)
-    else:
+    else: #get all series
         query = """
-        SELECT *
+        SELECT *,
+            CASE
+                WHEN units = 'Percent' THEN '%'
+                WHEN units = 'Index 1982-1984=100' THEN 'Index'
+                ELSE units
+            END AS new_units
         FROM clean_fred_metadata
         ORDER BY series_id
         """

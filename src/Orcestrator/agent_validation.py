@@ -7,34 +7,32 @@ class AgentValidator:
     VALID_INTENTS = {"ranking", "comparison", "correlation","trend"}
     VALID_DATE_GRAINS = {"DAY", "MONTH", "QUARTER", "YEAR"}
 
+    def __init__(self,message,raise_error=False):
+        self.message=message
+        self.raise_error=raise_error
+             
     @staticmethod
     def validate_plan(data_plan):
         """
         Validate the DataPlanBuilder output before loading data.
         """
         if data_plan is None:
-            raise ValueError("Data plan is None.")
+            return AgentValidator(message="Data plan is None.",raise_error=True)
         if not data_plan.question:
-            raise ValueError("Data plan is missing the original question.")
+            return AgentValidator(message="Data plan is missing the original question.",raise_error=True)
         if data_plan.question_intent not in AgentValidator.VALID_INTENTS:
-            raise ValueError(
-                f"Unsupported question intent: {data_plan.question_intent}. "
-                f"Expected one of {AgentValidator.VALID_INTENTS}.")
+            return AgentValidator(message=f"Unsupported question intent: {data_plan.question_intent}. Expected one of {AgentValidator.VALID_INTENTS}.",raise_error=True)
         if not data_plan.series_ids:
-            raise ValueError("Data plan did not identify any series_ids.")
+            return AgentValidator(message="Data plan did not identify any series_ids.",raise_error=True)
         if not isinstance(data_plan.series_ids, list):
-            raise TypeError("data_plan.series_ids must be a list.")
+            return AgentValidator(message="data_plan.series_ids must be a list.",raise_error=True)
         if data_plan.date_grain not in AgentValidator.VALID_DATE_GRAINS:
-            raise ValueError(
-                f"Invalid date_grain: {data_plan.date_grain}. "
-                f"Expected one of {AgentValidator.VALID_DATE_GRAINS}.")
+            return AgentValidator(message=f"Invalid date_grain: {data_plan.date_grain}. Expected one of {AgentValidator.VALID_DATE_GRAINS}.",raise_error=True)
         if not data_plan.start_date or not data_plan.end_date:
-            raise ValueError("Data plan must include both start_date and end_date.")
+            return AgentValidator(message="Data plan must include both start_date and end_date.",raise_error=True)
         if data_plan.start_date > data_plan.end_date:
-            raise ValueError(
-                f"Invalid date range: start_date {data_plan.start_date} "
-                f"is after end_date {data_plan.end_date}.")
-        return True
+            return AgentValidator(message=f"Invalid date range: start_date {data_plan.start_date} is after end_date {data_plan.end_date}.",raise_error=True)
+        return AgentValidator(message="",raise_error=False)
 
     @staticmethod
     def validate_data(data_loader):

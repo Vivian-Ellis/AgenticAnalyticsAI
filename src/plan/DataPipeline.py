@@ -19,6 +19,7 @@ class DataLoader:
     def __init__(self,data_plan):
         self.data=None
         self.data_plan=data_plan
+        self.fred_metadata=None
 
     def load_data(self):
         #pull relevant data (does the limiting and pulls date grain needed for aggergation)
@@ -28,6 +29,7 @@ class DataLoader:
         WHERE series_id in ({series_sql}) 
         and date between '{self.data_plan.start_date}' and '{self.data_plan.end_date}'"""
         self.data=db.run_query(query)
+        self.fred_metadata=db.get_series_metadata(self.data_plan.series_ids)
         return self.data
         
     def run(self):

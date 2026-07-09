@@ -20,29 +20,33 @@ def run_analytics_agent(question,chat_history=None):
     chat_history = chat_history or []
 
     data_plan=ClaudeDataPlanBuilder(question).run()
-    AgentValidator.validate_plan(data_plan)
 
-    data_loader = DataLoader(data_plan)
-    df=data_loader.run()
-    AgentValidator.validate_data(data_loader)
+    if data_plan.question_intent =="unsupported":
+        return None
+    else:
+        AgentValidator.validate_plan(data_plan) #future to-do move validation inside the planner tool build_entire_data_plan
 
-    tool = analytics_tool_registry.get_tool(data_loader.data_plan.question_intent)
-    AgentValidator.validate_tool(tool, data_loader)
+        data_loader = DataLoader(data_plan)
+        df=data_loader.run()
+        AgentValidator.validate_data(data_loader)
 
-    result = tool["function"](data_loader)
-    AgentValidator.validate_result(result)
+        tool = analytics_tool_registry.get_tool(data_loader.data_plan.question_intent)
+        AgentValidator.validate_tool(tool, data_loader)
 
-    chart_type = tool["default_chart"]
-    chart = charts_registry.Chart(result, chart_type)
-    chart_path = chart.run()
+        result = tool["function"](data_loader)
+        AgentValidator.validate_result(result)
 
-    return AgentResponse(question, result, chart_path, data_plan, tool)
+        chart_type = tool["default_chart"]
+        chart = charts_registry.Chart(result, chart_type,data_loader)
+        chart_path = chart.run()
+
+        return AgentResponse(question, result, chart_path, data_plan, tool)
 
 def run_query_agent(question,chat_history=None):
     chat_history = chat_history or []
 
     start_time = datetime.now()
-    data_plan=ClaudeDataPlanBuilder(question).run()
+    data_plan=ClaudeDataPlanBuilder(question).run() #future to-do have run_query
     end_time = datetime.now()
     duration = end_time - start_time
     print(f"ClaudeDataPlanBuilder Duration:   {duration}")
@@ -66,7 +70,7 @@ def run_query_agent(question,chat_history=None):
     duration = end_time - start_time
     print(f"validate_data Duration:   {duration}")
 
-    return df
+    return df.drop(columns=[data_plan.date_grain]) #future to-do move this to the data pipeline.
 
 def run_general_agent(question,metadata,chat_history=None):
     return summaries.run_general_assistant(question,metadata,chat_history)

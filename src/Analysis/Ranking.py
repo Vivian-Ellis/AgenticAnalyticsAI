@@ -36,17 +36,24 @@ class RankingAnalysis:
         #STEP 3 compute ranking and aggregation
         self.original_df=analysis.compute_df_aggregation(df,group_by_fields=self.data_loader.data_plan.date_grain,computation="mean")
         self.ranked_df=analysis.rank_periods(self.original_df, sort_by="Value", n=self.n, ascending=self.ascending_bool)
+        
+        units=self.data_loader.fred_metadata['new_units'][0]
+        self.ranked_df[f"Value ({units})"]=self.ranked_df["Value"]
+        self.ranked_df=self.ranked_df.reset_index()
+        self.ranked_df['Rank']=self.ranked_df.pop('Rank')
 
+        # STEP 4 short blurb
+        self.summary_narration=f"**{self.data_loader.fred_metadata['title'][0]}, {self.data_loader.fred_metadata['seasonal_adjustment'][0]}**"
         #STEP 4 send results to claude & return string
-        self.summary_narration=summaries.run_ranking_analysis(self.data_loader.data_plan.question,
-                                                self.data_loader.data_plan.dataset_context,
-                                                df,
-                                                self.ranked_df,
-                                                sort_field="Value",
-                                                ascending=self.ascending_bool,
-                                                n=self.n,
-                                                aggregation_method="mean",
-                                                group_by=self.data_loader.data_plan.date_grain)
+        # self.summary_narration=summaries.run_ranking_analysis(self.data_loader.data_plan.question,
+        #                                         self.data_loader.data_plan.dataset_context,
+        #                                         df,
+        #                                         self.ranked_df,
+        #                                         sort_field="Value",
+        #                                         ascending=self.ascending_bool,
+        #                                         n=self.n,
+        #                                         aggregation_method="mean",
+        #                                         group_by=self.data_loader.data_plan.date_grain)
         
         return RankingResult(
                     question=self.data_loader.data_plan.question,

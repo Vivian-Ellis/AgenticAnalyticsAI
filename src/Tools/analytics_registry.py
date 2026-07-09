@@ -121,20 +121,20 @@ def comparison_tool(data_loader):
     analysis = Comparison.ComparisonAnalysis(data_loader)
     return analysis.run_analysis()
 
-# @register_analytics_tool(
-#     "unsupported",
-#     description="""Uknown type of analysis the user is requesting to perform.""",
-#     input_schema={
-#         "type": "object",
-#         "properties": {
-#             "data_loader": {
-#                 "type": "object",
-#                 "description": "DataLoader object containing a DataPlan (from DataPlanBuilder) and analysis-ready metadata."
-#             }
-#         },
-#         "required": [""]
-#     },
-#     default_chart=None
-# )
-# def unsupported_analysis_tool():
-#     return None
+@register_analytics_tool(
+    "unsupported",
+    description="""Uknown type of analysis the user is requesting to perform.""",
+    input_schema={
+        "type": "object",
+        "properties": {
+            "data_loader": {
+                "type": "object",
+                "description": "DataLoader object containing a DataPlan (from DataPlanBuilder) and analysis-ready metadata."
+            }
+        },
+        "required": [""]
+    },
+    default_chart=None
+)
+def unsupported_analysis_tool():
+    return None

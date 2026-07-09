@@ -1,0 +1,29 @@
+<style>
+    html, body, [class*="css"]  {
+        font-family: 'Inter', sans-serif;
+    }
+    .stButton > button {
+        border-radius: 28px;
+    }
+
+    [data-testid="stSidebar"] {
+        border-right: 1px solid #EEE7E1;
+    }
+
+    /* hide avatars */
+    [data-testid="stChatMessageAvatarUser"],
+    [data-testid="stChatMessageAvatarAssistant"] {
+        display: none !important;
+    }
+
+    /* tighten spacing */
+    [data-testid="stChatMessage"] {
+        gap: 0rem !important;
+    }
+
+    /* user message bubble */
+    [data-testid="stChatMessage"]:has(.user-message) {
+        background-color: #F9F1EC;
+        border-radius: 18px;
+    }
+</style>

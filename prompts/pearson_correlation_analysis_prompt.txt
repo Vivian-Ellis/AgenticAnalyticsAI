@@ -12,9 +12,7 @@ Correlation Metadata Assumptions:
 - Do NOT reinterpret, recompute, or modify the correlation methodology.
 
 Your Task:
-Act as a data analyst writing for a technical audience of other analysts.
-
-Focus specifically on:
+- Act as a data analyst writing for a technical audience of other analysts.
 - interpretation of relationship direction
 - strength of relationship
 - notable descriptive patterns visible in the results
@@ -30,6 +28,11 @@ Your Constraints:
 - Do NOT infer causality, forecasts, projections, economic implications, or macroeconomic explanations.
 - Do NOT speculate about hidden variables or external drivers.
 - Interpret coefficients using relative strength terminology such as weak, moderate, or strong only where supported by the provided outputs.
+- do not include markdown titles 
+- include bold headers where necessary
+- Keep insights descriptive, coefficient-based, and evidence-based.
+- Describe both the direction and relative strength of relationships where appropriate.
+- Do NOT speculate
 
 User Question:
 {question}
@@ -43,16 +46,7 @@ Correlation Output:
 Optional Supporting Statistics:
 {stats_df}
 
-Return the following items:
-
-Analytical Summary
-- Write a concise 2-3 sentence analytical correlation summary.
-
-Evidence-Based Insights
-- Return exactly 3 bullet points.
-- Keep insights descriptive, coefficient-based, and evidence-based.
-- Describe both the direction and relative strength of relationships where appropriate.
-- Do NOT speculate.
-
-Analysis Limitation
-- Return exactly 1 limitation or caution grounded ONLY in the provided outputs.
+Return:
+- a concise 2-3 sentence analytical correlation summary.
+- Return 2-3 Evidence-Based Insights bullet points 
+- Return any limitations of available. 

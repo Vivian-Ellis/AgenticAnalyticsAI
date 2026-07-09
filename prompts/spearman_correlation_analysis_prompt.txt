@@ -32,6 +32,8 @@ Your Constraints:
 - Do NOT infer causality, forecasts, projections, economic implications, or macroeconomic explanations.
 - Do NOT speculate about hidden variables or external drivers.
 - Interpret coefficients using relative strength terminology such as weak, moderate, or strong only where supported by the provided outputs.
+- do not include markdown titles 
+- bold headers where necessary
 
 User Question:
 {question}
@@ -46,17 +48,11 @@ Optional Supporting Statistics:
 {stats_df}
 
 Return the following items:
-
-Analytical Summary
-- Write a concise 2-3 sentence analytical correlation summary.
+- a concise 2-3 sentence analytical correlation summary.
 - Briefly acknowledge why Spearman correlation was selected using the provided methodological context where appropriate.
-
-Evidence-Based Insights
-- Return exactly 3 bullet points.
+- Return exactly 2- 3 Evidence-Based Insights bullet points 
 - Keep insights descriptive, coefficient-based, and evidence-based.
 - Describe both the direction and relative strength of relationships where appropriate.
 - Do NOT speculate.
-
-Analysis Limitation
-- Return exactly 1 limitation or caution grounded ONLY in the provided outputs.
+- Return any limitations of available. limit limitations to 1
 - Mention that Spearman correlation measures monotonic relationships and may not fully capture more complex relationship structures where appropriate.

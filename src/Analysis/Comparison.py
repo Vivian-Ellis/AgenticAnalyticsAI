@@ -27,7 +27,14 @@ class ComparisonAnalysis:
         user_input=self.data_loader.data_plan.question
         df=self.data_loader.data.copy()
         num_groups=df[self.data_loader.data_plan.date_grain].nunique()
-        print(num_groups)
+
+        #extra computation if necessary
+        if "CPIAUCSL" in self.data_loader.data_plan.series_ids and "inflation" in user_input.lower():
+            PERIODS_BY_DATE_GRAIN = {"MONTH": 12,"QUARTER": 4,"YEAR": 1}
+            print(df)
+            df["value"] = df["value"].pct_change(periods=PERIODS_BY_DATE_GRAIN.get(self.data_loader.data_plan.date_grain, 12)) * 100
+            print(df)
+        
         comparison_tools = list_anthropic_comparison_tools()
         message = f"""You are a routing layer. You must call exactly one comparison tool.
         Do not answer the user directly.

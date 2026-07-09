@@ -50,21 +50,21 @@ def rule_based_intent_override(question):
 
     return None
 
-@register_planner_tool(
-    "predict_analytical_intent",
-    description="Selects the best analytical intent for the user question.",
-    input_schema={
-        "type": "object",
-        "properties": {
-            "question": {
-                "type": "string",
-                "description": "The user's most recent analytical question."
-            }
-        },
-        "required": ["question"]
-    },
-    output_type="str"
-)
+# @register_planner_tool(
+#     "predict_analytical_intent",
+#     description="Selects the best analytical intent for the user question.",
+#     input_schema={
+#         "type": "object",
+#         "properties": {
+#             "question": {
+#                 "type": "string",
+#                 "description": "The user's most recent analytical question."
+#             }
+#         },
+#         "required": ["question"]
+#     },
+#     output_type="str"
+# )
 def predict_analytical_intent(question):
     """
     this function will predict the analytical intent of the question. 
@@ -85,21 +85,21 @@ def predict_analytical_intent(question):
     # Make a prediction using ml model
     return QUESTION_INTENT_MODEL.predict([question])[0]
 
-@register_planner_tool(
-    "predict_series_intent",
-    description="Selects the best FRED series IDs for the user question.",
-    input_schema={
-        "type": "object",
-        "properties": {
-            "question": {
-                "type": "string",
-                "description": "The user's most recent analytical question."
-            }
-        },
-        "required": ["question"]
-    },
-    output_type="list[str]"
-)
+# @register_planner_tool(
+#     "predict_series_intent",
+#     description="Selects the best FRED series IDs for the user question.",
+#     input_schema={
+#         "type": "object",
+#         "properties": {
+#             "question": {
+#                 "type": "string",
+#                 "description": "The user's most recent analytical question."
+#             }
+#         },
+#         "required": ["question"]
+#     },
+#     output_type="list[str]"
+# )
 def predict_series_intent(question):
     """
     this function uses LLM to determine which dataset to perform and analysis on.
@@ -116,21 +116,21 @@ def predict_series_intent(question):
     return top_results
 
 
-@register_planner_tool(
-    "timeline_intent",
-    description="Selects the best date range for the user question.",
-    input_schema={
-        "type": "object",
-        "properties": {
-            "question": {
-                "type": "string",
-                "description": "The user's most recent analytical question."
-            }
-        },
-        "required": ["question","date_grain"]
-    },
-    output_type="str"
-)
+# @register_planner_tool(
+#     "timeline_intent",
+#     description="Selects the best date range for the user question.",
+#     input_schema={
+#         "type": "object",
+#         "properties": {
+#             "question": {
+#                 "type": "string",
+#                 "description": "The user's most recent analytical question."
+#             }
+#         },
+#         "required": ["question","date_grain"]
+#     },
+#     output_type="str"
+# )
 def timeline_intent(question,date_grain):
     """
     this function uses claude LLM to determine a date range for the user question
@@ -162,21 +162,21 @@ def timeline_intent_failed(question,date_range):
     prompt=summaries.timeframe_validation_failed_prompt(question,date_range)
     return summaries.run_prompt(prompt)
 
-@register_planner_tool(
-    "date_aggregation_grain_intent",
-    description="Selects the best date grain (aggresgation on the date field) for the users question. Is one of the following: 'DAY','WEEK','MONTH','QUARTER','YEAR','YEAR_MONTH'",
-    input_schema={
-        "type": "object",
-        "properties": {
-            "question": {
-                "type": "string",
-                "description": "The user's most recent analytical question."
-            }
-        },
-        "required": ["question","date_grain"]
-    },
-    output_type="str"
-)
+# @register_planner_tool(
+#     "date_aggregation_grain_intent",
+#     description="Selects the best date grain (aggresgation on the date field) for the users question. Is one of the following: 'DAY','WEEK','MONTH','QUARTER','YEAR','YEAR_MONTH'",
+#     input_schema={
+#         "type": "object",
+#         "properties": {
+#             "question": {
+#                 "type": "string",
+#                 "description": "The user's most recent analytical question."
+#             }
+#         },
+#         "required": ["question","date_grain"]
+#     },
+#     output_type="str"
+# )
 def date_aggregation_grain_intent(question):
     date_grain=summaries.run_prompt(summaries.build_timeframe_aggregation_prompt(question))
     #quick validation
