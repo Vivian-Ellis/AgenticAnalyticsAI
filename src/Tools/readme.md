@@ -30,6 +30,10 @@ The chart registry has 3 main charts used by FRED AI agent: Bar plot, Scatter pl
 
 The chart registry does not currently have the ability to take requests from users on what charts to use. Charts will always print to the chat log when available.
 
+The analytical tools also define an appropriate default visualization.
+Once the analysis has been completed, the application can use the chart type registered with that analytical workflow to generate a visualization of the result.
+That means the application isn't limited to returning an LLM response. The user can receive the natural-language interpretation along with the underlying analytical output and an appropriate visualization.
+
 ## Conversation Registry 
 The conversaion registry help claude determine the route. A route is definded by the type of quesiton a user intends on: 
 -analytics, this will produce a full analytical summary.
