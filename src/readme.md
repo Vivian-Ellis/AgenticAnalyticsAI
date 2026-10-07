@@ -6,11 +6,6 @@
 
 
 
-**Visualization**
-
-The analytical tools also define an appropriate default visualization.
-Once the analysis has been completed, the application can use the chart type registered with that analytical workflow to generate a visualization of the result.
-That means the application isn't limited to returning an LLM response. The user can receive the natural-language interpretation along with the underlying analytical output and an appropriate visualization.
 
 **LLM narration**
 
