@@ -1,13 +1,4 @@
-**Conversation routing**
 
-When a user submits a question, the first layer determines what kind of conversation the user is trying to have with the application. This is separate from determining which statistical analysis they ultimately want to perform.
-I start with deterministic routing for requests where the intent is sufficiently obvious. I normalize the user's input and directly identify things such as greetings, questions about the source of the data, and questions about what data is available. I chose deterministic routing for these cases because there is already a known solution. There is no reason to introduce another probabilistic decision, LLM call, additional latency, or API cost to interpret something like a greeting.
-If the request doesn't match one of those deterministic routes, I give Claude access to a constrained conversation tool registry. Rather than allowing Claude to decide arbitrarily what to do, I give it a defined set of conversational capabilities and have it select the appropriate one.
-Those routes include a new analytical request, an explanation of a particular economic indicator, an analytical follow-up, a clarification of a previous result, a raw data query, and a general fallback for requests the application doesn't support.
-I intentionally distinguish between an analytical follow-up and a result clarification. An analytical follow-up is something like, “Now do the same thing for CPI,” or “Make that monthly.” The new question depends on the previous analysis and requires another analysis to be executed. In that case, I provide the existing conversation state so that the incomplete follow-up can be expanded into a complete analytical question and then sent back through the analytical workflow.
-A result clarification is different. A user might ask something like, “What does that correlation mean?” The application already has the analytical result, so it doesn't need to retrieve the data and execute the analysis again. The existing conversational context can instead be used to expand on the previous explanation.
-I also have a data-query route for situations where the user isn't asking for statistical analysis at all and simply wants to retrieve actual observations from the dataset. That lets the application provide the underlying data without unnecessarily invoking an analytical workflow.
-Once Claude determines the appropriate conversation tool, Claude doesn't execute the application logic itself. Python looks up the selected tool in the registry and executes the registered function. That separation between LLM decision-making and deterministic execution is a pattern I use throughout the application.
 
 **Constructing the analytical DataPlan**
 
